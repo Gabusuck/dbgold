@@ -44,6 +44,28 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
   const light = resolvedTheme !== 'dark'
 
+  // Live settings state: initialize from server-rendered props, then poll API for updates
+  const [liveSettings, setLiveSettings] = useState<GoldSettings>(settings)
+
+  useEffect(() => {
+    let mounted = true
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/settings')
+        if (!res.ok) return
+        const json = await res.json()
+        if (json?.ok && json.settings && mounted) {
+          setLiveSettings(json.settings)
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // initial fetch and interval
+    fetchSettings()
+    const id = setInterval(fetchSettings, 10000) // every 10s
+    return () => { mounted = false; clearInterval(id) }
+  }, [])
+
   // Determine short-term trend for gold and silver from recent price history
   const latest = priceHistory && priceHistory.length > 0 ? priceHistory[0] : null
   const prev = priceHistory && priceHistory.length > 1 ? priceHistory[1] : null
@@ -66,8 +88,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   const activeParams = useMemo(() => {
     if (metalType === 'ouro') {
       const purity = selectedGold.purity
-      const refPrice = settings.price_per_gram_24k
-      const discount = settings.discount_per_gram
+      const refPrice = liveSettings.price_per_gram_24k
+      const discount = liveSettings.discount_per_gram
       const official = officialPricePerGram(refPrice, purity)
       const pays = payPricePerGram(refPrice, discount, purity)
       return {
@@ -79,8 +101,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
       }
     } else {
       const purity = selectedSilver.purity
-      const refPrice = settings.price_per_gram_silver_999 ?? 1.00
-      const discount = settings.discount_per_gram_silver ?? 0.15
+      const refPrice = liveSettings.price_per_gram_silver_999 ?? 1.00
+      const discount = liveSettings.discount_per_gram_silver ?? 0.15
       const official = officialPricePerGram(refPrice, purity)
       const pays = payPricePerGram(refPrice, discount, purity)
       return {
