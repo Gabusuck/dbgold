@@ -388,7 +388,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     <div className="p-4 text-center" style={{ background: breakdownBg }}>
                       <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: textMuted }}>Recebe</div>
                       <div className="text-4xl font-bold font-mono tracking-tight" style={{ color: isGold ? '#d97706' : (light ? '#475569' : '#e2e8f0') }}>
-                        ≈ {formatEUR(activeParams.total)}
+                        {formatEUR(activeParams.total)}
                       </div>
                     </div>
                     <div className="divide-y" style={{ borderColor: `${accent}10`, background: breakdownRowBg }}>
@@ -398,7 +398,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       </div>
                       <div className="flex justify-between items-center px-4 py-2.5 text-xs">
                         <span style={{ color: textSecondary }}>Pagamos</span>
-                        <span className="font-mono font-bold" style={{ color: accent }}>≈ {formatEUR(activeParams.payPerGram)}/g × {gramsNum}g</span>
+                        <span className="font-mono font-bold" style={{ color: accent }}>{formatEUR(activeParams.payPerGram)}/g × {gramsNum}g</span>
                       </div>
                     </div>
                   </div>
