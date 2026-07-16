@@ -87,39 +87,37 @@ export async function getPriceHistory(): Promise<PriceHistoryEntry[]> {
    ───────────────────────────────────────── */
 export async function getSettings(): Promise<GoldSettings> {
   let currentSettings = { ...DEFAULT_SETTINGS }
-
-  // 1. Try loading from local cookies first (highest priority for offline/fallback mode)
-  try {
-    const cookieStore = await cookies()
-    const localCookie = cookieStore.get('gold_settings_local')?.value
-    if (localCookie) {
-      const parsed = JSON.parse(localCookie)
-      if (parsed.price_per_gram_24k != null) currentSettings.price_per_gram_24k = Number(parsed.price_per_gram_24k)
-      if (parsed.discount_per_gram != null) currentSettings.discount_per_gram = Number(parsed.discount_per_gram)
-      if (parsed.price_per_gram_silver_999 != null) currentSettings.price_per_gram_silver_999 = Number(parsed.price_per_gram_silver_999)
-      if (parsed.discount_per_gram_silver != null) currentSettings.discount_per_gram_silver = Number(parsed.discount_per_gram_silver)
-      if (parsed.updated_at != null) currentSettings.updated_at = parsed.updated_at
-      console.log('[COOKIE] Loaded settings from cookie:', currentSettings)
-      return currentSettings
-    }
-  } catch (e) {
-    console.error('Error reading local settings cookie:', e)
-  }
-
-  // 2. Check if Supabase is configured
+  // Check if Supabase is configured
   const hasSupabaseConfig = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   )
   console.log('[DEBUG] Supabase configured:', hasSupabaseConfig)
   if (!hasSupabaseConfig) {
-    console.warn('[WARN] Supabase environment variables not set!')
+    console.warn('[WARN] Supabase environment variables not set! Falling back to local cookie if present')
+    // Try cookie fallback when Supabase is not configured
+    try {
+      const cookieStore = await cookies()
+      const localCookie = cookieStore.get('gold_settings_local')?.value
+      if (localCookie) {
+        const parsed = JSON.parse(localCookie)
+        if (parsed.price_per_gram_24k != null) currentSettings.price_per_gram_24k = Number(parsed.price_per_gram_24k)
+        if (parsed.discount_per_gram != null) currentSettings.discount_per_gram = Number(parsed.discount_per_gram)
+        if (parsed.price_per_gram_silver_999 != null) currentSettings.price_per_gram_silver_999 = Number(parsed.price_per_gram_silver_999)
+        if (parsed.discount_per_gram_silver != null) currentSettings.discount_per_gram_silver = Number(parsed.discount_per_gram_silver)
+        if (parsed.updated_at != null) currentSettings.updated_at = parsed.updated_at
+        console.log('[COOKIE] Loaded settings from cookie (fallback):', currentSettings)
+        return currentSettings
+      }
+    } catch (e) {
+      console.error('Error reading local settings cookie:', e)
+    }
     return currentSettings
   }
 
-  // 3. Try loading from Supabase
+  // Try loading from Supabase (preferred source of truth)
   try {
-    console.log('[SUPABASE] Attempting to read settings...')
+    console.log('[SUPABASE] Attempting to read settings (preferred) ...')
     const supabase = createReadClient()
     const { data, error } = await supabase
       .from('gold_settings')
@@ -129,6 +127,23 @@ export async function getSettings(): Promise<GoldSettings> {
 
     if (error) {
       console.error('[SUPABASE] Query error:', error.message, error.code)
+      // If query fails, fall back to cookie if present
+      try {
+        const cookieStore = await cookies()
+        const localCookie = cookieStore.get('gold_settings_local')?.value
+        if (localCookie) {
+          const parsed = JSON.parse(localCookie)
+          if (parsed.price_per_gram_24k != null) currentSettings.price_per_gram_24k = Number(parsed.price_per_gram_24k)
+          if (parsed.discount_per_gram != null) currentSettings.discount_per_gram = Number(parsed.discount_per_gram)
+          if (parsed.price_per_gram_silver_999 != null) currentSettings.price_per_gram_silver_999 = Number(parsed.price_per_gram_silver_999)
+          if (parsed.discount_per_gram_silver != null) currentSettings.discount_per_gram_silver = Number(parsed.discount_per_gram_silver)
+          if (parsed.updated_at != null) currentSettings.updated_at = parsed.updated_at
+          console.log('[COOKIE] Loaded settings from cookie after Supabase error:', currentSettings)
+          return currentSettings
+        }
+      } catch (e) {
+        console.error('Error reading local settings cookie:', e)
+      }
       return currentSettings
     }
 
@@ -151,6 +166,23 @@ export async function getSettings(): Promise<GoldSettings> {
     console.log('[SUPABASE] Successfully loaded settings:', currentSettings)
   } catch (e) {
     console.error('[SUPABASE] Exception:', e instanceof Error ? e.message : String(e))
+    // On exception, try cookie fallback
+    try {
+      const cookieStore = await cookies()
+      const localCookie = cookieStore.get('gold_settings_local')?.value
+      if (localCookie) {
+        const parsed = JSON.parse(localCookie)
+        if (parsed.price_per_gram_24k != null) currentSettings.price_per_gram_24k = Number(parsed.price_per_gram_24k)
+        if (parsed.discount_per_gram != null) currentSettings.discount_per_gram = Number(parsed.discount_per_gram)
+        if (parsed.price_per_gram_silver_999 != null) currentSettings.price_per_gram_silver_999 = Number(parsed.price_per_gram_silver_999)
+        if (parsed.discount_per_gram_silver != null) currentSettings.discount_per_gram_silver = Number(parsed.discount_per_gram_silver)
+        if (parsed.updated_at != null) currentSettings.updated_at = parsed.updated_at
+        console.log('[COOKIE] Loaded settings from cookie after Supabase exception:', currentSettings)
+        return currentSettings
+      }
+    } catch (e) {
+      console.error('Error reading local settings cookie:', e)
+    }
   }
 
   return currentSettings

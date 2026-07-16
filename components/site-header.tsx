@@ -37,7 +37,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        'sticky top-5 mt-2 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl transition-all duration-500 md:top-6 md:mt-3 md:w-[calc(100%-4rem)]',
+        'sticky top-3 mt-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl transition-all duration-500 md:top-4 md:mt-1 md:w-[calc(100%-4rem)]',
         scrolled
           ? isLight
             ? 'shadow-[0_2px_12px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.05)]'

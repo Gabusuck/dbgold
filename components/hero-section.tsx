@@ -10,7 +10,8 @@ import {
   payPricePerGram,
   type GoldSettings,
 } from '@/lib/gold'
-import { Trash2, TrendingUp, Scale, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, TrendingUp, TrendingDown, Minus, Scale, ChevronDown, ChevronUp } from 'lucide-react'
+import type { PriceHistoryEntry } from '@/app/actions'
 import { toast } from 'sonner'
 
 type HistoryItem = {
@@ -25,7 +26,7 @@ type HistoryItem = {
 
 const WEIGHT_PRESETS = [1, 5, 10, 20, 50, 100]
 
-export function HeroSection({ settings }: { settings: GoldSettings }) {
+export function HeroSection({ settings, priceHistory }: { settings: GoldSettings; priceHistory?: PriceHistoryEntry[] }) {
   const [metalType, setMetalType] = useState<'ouro' | 'prata'>('ouro')
   const [karatValue, setKaratValue] = useState('18')
   const [silverValue, setSilverValue] = useState('925')
@@ -43,6 +44,34 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
 
   const light = resolvedTheme !== 'dark'
 
+  // Live settings state: initialize from server-rendered props, then poll API for updates
+  const [liveSettings, setLiveSettings] = useState<GoldSettings>(settings)
+
+  useEffect(() => {
+    let mounted = true
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/settings')
+        if (!res.ok) return
+        const json = await res.json()
+        if (json?.ok && json.settings && mounted) {
+          setLiveSettings(json.settings)
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // initial fetch and interval
+    fetchSettings()
+    const id = setInterval(fetchSettings, 10000) // every 10s
+    return () => { mounted = false; clearInterval(id) }
+  }, [])
+
+  // Determine short-term trend for gold and silver from recent price history
+  const latest = priceHistory && priceHistory.length > 0 ? priceHistory[0] : null
+  const prev = priceHistory && priceHistory.length > 1 ? priceHistory[1] : null
+  const goldIsUp = latest && prev ? (latest.price_gold - prev.price_gold) > 0 : null
+  const silverIsUp = latest && prev ? (latest.price_silver - prev.price_silver) > 0 : null
+
   const selectedGold = useMemo(
     () => KARATS.find((k) => String(k.karat) === karatValue) ?? KARATS[2],
     [karatValue]
@@ -59,8 +88,8 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
   const activeParams = useMemo(() => {
     if (metalType === 'ouro') {
       const purity = selectedGold.purity
-      const refPrice = settings.price_per_gram_24k
-      const discount = settings.discount_per_gram
+      const refPrice = liveSettings.price_per_gram_24k
+      const discount = liveSettings.discount_per_gram
       const official = officialPricePerGram(refPrice, purity)
       const pays = payPricePerGram(refPrice, discount, purity)
       return {
@@ -72,8 +101,8 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
       }
     } else {
       const purity = selectedSilver.purity
-      const refPrice = settings.price_per_gram_silver_999 ?? 1.00
-      const discount = settings.discount_per_gram_silver ?? 0.15
+      const refPrice = liveSettings.price_per_gram_silver_999 ?? 1.00
+      const discount = liveSettings.discount_per_gram_silver ?? 0.15
       const official = officialPricePerGram(refPrice, purity)
       const pays = payPricePerGram(refPrice, discount, purity)
       return {
@@ -214,7 +243,13 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                     {settings.price_per_gram_24k > 0 ? formatEUR(settings.price_per_gram_24k) : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    <TrendingUp className="h-3 w-3 text-emerald-500" /> por grama
+                    {goldIsUp === null ? (
+                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                    ) : goldIsUp ? (
+                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                    )}
                   </div>
                 </div>
                 <div className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse">
@@ -225,7 +260,13 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                       : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    <TrendingUp className="h-3 w-3 text-emerald-500" /> por grama
+                    {silverIsUp === null ? (
+                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                    ) : silverIsUp ? (
+                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                    )}
                   </div>
                 </div>
               </div>
