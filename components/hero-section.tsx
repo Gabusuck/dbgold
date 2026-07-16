@@ -171,7 +171,7 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex items-center">
-        <div className="mx-auto max-w-7xl w-full px-5 md:px-8 py-10 md:py-0">
+        <div className="mx-auto max-w-7xl w-full px-5 md:px-8 py-6 md:py-0">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
 
             {/* ── Left: Hero copy ── */}
