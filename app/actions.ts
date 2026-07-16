@@ -35,8 +35,19 @@ export async function getPriceHistory(): Promise<PriceHistoryEntry[]> {
     cookieStore.delete('price_history_v3')
   } catch (e) {}
 
-  // 1. Try loading from Supabase first
+  // Check if Supabase is configured
+  const hasSupabaseConfig = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+  if (!hasSupabaseConfig) {
+    console.warn('[WARN] Supabase not configured, returning empty history')
+    return DEFAULT_HISTORY
+  }
+
+  // Try loading from Supabase
   try {
+    console.log('[SUPABASE] Attempting to read price history...')
     const supabase = createReadClient()
     const { data, error } = await supabase
       .from('price_history')
@@ -44,17 +55,28 @@ export async function getPriceHistory(): Promise<PriceHistoryEntry[]> {
       .order('created_at', { ascending: false })
       .limit(10)
 
-    if (!error && data && data.length > 0) {
-      return data.map((row) => ({
-        timestamp: row.timestamp,
-        price_gold: Number(row.price_gold),
-        price_silver: Number(row.price_silver),
-        trend_gold: row.trend_gold as 'up' | 'down' | 'same',
-        trend_silver: row.trend_silver as 'up' | 'down' | 'same',
-      }))
+    if (error) {
+      console.error('[SUPABASE] History query error:', error.message, error.code)
+      return DEFAULT_HISTORY
     }
+
+    if (!data || data.length === 0) {
+      console.warn('[SUPABASE] No price history data found')
+      return DEFAULT_HISTORY
+    }
+
+    const history = data.map((row) => ({
+      timestamp: row.timestamp,
+      price_gold: Number(row.price_gold),
+      price_silver: Number(row.price_silver),
+      trend_gold: row.trend_gold as 'up' | 'down' | 'same',
+      trend_silver: row.trend_silver as 'up' | 'down' | 'same',
+    }))
+
+    console.log('[SUPABASE] Successfully loaded', history.length, 'price history entries')
+    return history
   } catch (e) {
-    console.warn('Supabase not available, reading history from cookies:', e)
+    console.error('[SUPABASE] Exception:', e instanceof Error ? e.message : String(e))
   }
 
   return DEFAULT_HISTORY
@@ -77,14 +99,27 @@ export async function getSettings(): Promise<GoldSettings> {
       if (parsed.price_per_gram_silver_999 != null) currentSettings.price_per_gram_silver_999 = Number(parsed.price_per_gram_silver_999)
       if (parsed.discount_per_gram_silver != null) currentSettings.discount_per_gram_silver = Number(parsed.discount_per_gram_silver)
       if (parsed.updated_at != null) currentSettings.updated_at = parsed.updated_at
+      console.log('[COOKIE] Loaded settings from cookie:', currentSettings)
       return currentSettings
     }
   } catch (e) {
     console.error('Error reading local settings cookie:', e)
   }
 
-  // 2. Try loading from Supabase
+  // 2. Check if Supabase is configured
+  const hasSupabaseConfig = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+  console.log('[DEBUG] Supabase configured:', hasSupabaseConfig)
+  if (!hasSupabaseConfig) {
+    console.warn('[WARN] Supabase environment variables not set!')
+    return currentSettings
+  }
+
+  // 3. Try loading from Supabase
   try {
+    console.log('[SUPABASE] Attempting to read settings...')
     const supabase = createReadClient()
     const { data, error } = await supabase
       .from('gold_settings')
@@ -92,20 +127,30 @@ export async function getSettings(): Promise<GoldSettings> {
       .eq('id', 1)
       .single()
 
-    if (!error && data) {
-      currentSettings.price_per_gram_24k = Number(data.price_per_gram_24k)
-      currentSettings.discount_per_gram = Number(data.discount_per_gram)
-      currentSettings.updated_at = data.updated_at || currentSettings.updated_at
-
-      if (data.price_per_gram_silver_999 != null) {
-        currentSettings.price_per_gram_silver_999 = Number(data.price_per_gram_silver_999)
-      }
-      if (data.discount_per_gram_silver != null) {
-        currentSettings.discount_per_gram_silver = Number(data.discount_per_gram_silver)
-      }
+    if (error) {
+      console.error('[SUPABASE] Query error:', error.message, error.code)
+      return currentSettings
     }
+
+    if (!data) {
+      console.warn('[SUPABASE] No data returned from gold_settings table')
+      return currentSettings
+    }
+
+    currentSettings.price_per_gram_24k = Number(data.price_per_gram_24k)
+    currentSettings.discount_per_gram = Number(data.discount_per_gram)
+    currentSettings.updated_at = data.updated_at || currentSettings.updated_at
+
+    if (data.price_per_gram_silver_999 != null) {
+      currentSettings.price_per_gram_silver_999 = Number(data.price_per_gram_silver_999)
+    }
+    if (data.discount_per_gram_silver != null) {
+      currentSettings.discount_per_gram_silver = Number(data.discount_per_gram_silver)
+    }
+
+    console.log('[SUPABASE] Successfully loaded settings:', currentSettings)
   } catch (e) {
-    console.error('Error fetching settings from Supabase:', e)
+    console.error('[SUPABASE] Exception:', e instanceof Error ? e.message : String(e))
   }
 
   return currentSettings
