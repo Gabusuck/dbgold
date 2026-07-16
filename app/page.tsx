@@ -63,7 +63,7 @@ export default async function Home() {
       <SiteHeader />
 
       <main className="flex-1 flex flex-col">
-        <HeroSection settings={settings} />
+        <HeroSection settings={settings} priceHistory={history} />
         <PriceTable settings={settings} priceHistory={history} />
         <WhatsappSection />
       </main>

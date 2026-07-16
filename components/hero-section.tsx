@@ -10,7 +10,8 @@ import {
   payPricePerGram,
   type GoldSettings,
 } from '@/lib/gold'
-import { Trash2, TrendingUp, Scale, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, TrendingUp, TrendingDown, Minus, Scale, ChevronDown, ChevronUp } from 'lucide-react'
+import type { PriceHistoryEntry } from '@/app/actions'
 import { toast } from 'sonner'
 
 type HistoryItem = {
@@ -25,7 +26,7 @@ type HistoryItem = {
 
 const WEIGHT_PRESETS = [1, 5, 10, 20, 50, 100]
 
-export function HeroSection({ settings }: { settings: GoldSettings }) {
+export function HeroSection({ settings, priceHistory }: { settings: GoldSettings; priceHistory?: PriceHistoryEntry[] }) {
   const [metalType, setMetalType] = useState<'ouro' | 'prata'>('ouro')
   const [karatValue, setKaratValue] = useState('18')
   const [silverValue, setSilverValue] = useState('925')
@@ -42,6 +43,12 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
   }, [])
 
   const light = resolvedTheme !== 'dark'
+
+  // Determine short-term trend for gold and silver from recent price history
+  const latest = priceHistory && priceHistory.length > 0 ? priceHistory[0] : null
+  const prev = priceHistory && priceHistory.length > 1 ? priceHistory[1] : null
+  const goldIsUp = latest && prev ? (latest.price_gold - prev.price_gold) > 0 : null
+  const silverIsUp = latest && prev ? (latest.price_silver - prev.price_silver) > 0 : null
 
   const selectedGold = useMemo(
     () => KARATS.find((k) => String(k.karat) === karatValue) ?? KARATS[2],
@@ -214,7 +221,13 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                     {settings.price_per_gram_24k > 0 ? formatEUR(settings.price_per_gram_24k) : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    <TrendingUp className="h-3 w-3 text-emerald-500" /> por grama
+                    {goldIsUp === null ? (
+                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                    ) : goldIsUp ? (
+                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                    )}
                   </div>
                 </div>
                 <div className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse">
@@ -225,7 +238,13 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                       : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    <TrendingUp className="h-3 w-3 text-emerald-500" /> por grama
+                    {silverIsUp === null ? (
+                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                    ) : silverIsUp ? (
+                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -369,7 +388,7 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                     <div className="p-4 text-center" style={{ background: breakdownBg }}>
                       <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: textMuted }}>Recebe</div>
                       <div className="text-4xl font-bold font-mono tracking-tight" style={{ color: isGold ? '#d97706' : (light ? '#475569' : '#e2e8f0') }}>
-                        {formatEUR(activeParams.total)}
+                        ≈ {formatEUR(activeParams.total)}
                       </div>
                     </div>
                     <div className="divide-y" style={{ borderColor: `${accent}10`, background: breakdownRowBg }}>
@@ -379,7 +398,7 @@ export function HeroSection({ settings }: { settings: GoldSettings }) {
                       </div>
                       <div className="flex justify-between items-center px-4 py-2.5 text-xs">
                         <span style={{ color: textSecondary }}>Pagamos</span>
-                        <span className="font-mono font-bold" style={{ color: accent }}>{formatEUR(activeParams.payPerGram)}/g × {gramsNum}g</span>
+                        <span className="font-mono font-bold" style={{ color: accent }}>≈ {formatEUR(activeParams.payPerGram)}/g × {gramsNum}g</span>
                       </div>
                     </div>
                   </div>
