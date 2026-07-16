@@ -240,7 +240,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 >
                   <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600/80 mb-2">Ouro 24K</div>
                   <div className="text-xl xs:text-2xl font-bold text-amber-500 font-mono">
-                    {settings.price_per_gram_24k > 0 ? formatEUR(settings.price_per_gram_24k) : 'Sob Consulta'}
+                    {liveSettings.price_per_gram_24k > 0 ? formatEUR(liveSettings.price_per_gram_24k) : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
                     {goldIsUp === null ? (
@@ -255,8 +255,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 <div className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse">
                   <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-2" style={{ color: textMuted }}>Prata 999</div>
                   <div className="text-xl xs:text-2xl font-bold font-mono" style={{ color: light ? '#475569' : '#e2e8f0' }}>
-                    {settings.price_per_gram_silver_999 && settings.price_per_gram_silver_999 > 0
-                      ? formatEUR(settings.price_per_gram_silver_999)
+                    {liveSettings.price_per_gram_silver_999 && liveSettings.price_per_gram_silver_999 > 0
+                      ? formatEUR(liveSettings.price_per_gram_silver_999)
                       : 'Sob Consulta'}
                   </div>
                   <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
