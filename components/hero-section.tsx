@@ -140,6 +140,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
   const isGold = metalType === 'ouro'
   const accent = isGold ? '#f59e0b' : '#64748b'
+  const [showDebug, setShowDebug] = useState(false)
 
   // ── Light-mode palette tokens ──
   const bg = light ? '#fdf8f0' : '#111111'
@@ -485,6 +486,25 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Debug toggle (non-destructive) */}
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={() => setShowDebug((v) => !v)}
+                      className="text-[11px] px-3 py-1 rounded-lg bg-black/5 hover:bg-black/10 transition"
+                    >
+                      {showDebug ? 'Fechar debug' : 'Mostrar debug'}
+                    </button>
+                  </div>
+
+                  {showDebug && (
+                    <div className="mt-3 p-3 rounded-lg text-xs bg-black/5 overflow-auto max-h-48" style={{ color: textPrimary }}>
+                      <div className="font-bold mb-1">liveSettings</div>
+                      <pre className="text-[11px] leading-snug mb-2">{JSON.stringify(liveSettings, null, 2)}</pre>
+                      <div className="font-bold mb-1">activeParams (current)</div>
+                      <pre className="text-[11px] leading-snug">{JSON.stringify(activeParams, null, 2)}</pre>
                     </div>
                   )}
 
