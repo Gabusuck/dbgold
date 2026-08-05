@@ -20,15 +20,22 @@ export function SiteHeader() {
 
   useEffect(() => {
     setMounted(true)
-    // Force scroll to top on load/refresh so the ticker is always visible
+    
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual'
     }
-    window.scrollTo(0, 0)
+    
+    // Safari ignores scrollTo if run too early, delay it slightly to guarantee it fires
+    const scrollTimer = setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 50)
 
     const handler = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
+    return () => {
+      window.removeEventListener('scroll', handler)
+      clearTimeout(scrollTimer)
+    }
   }, [])
 
   // resolvedTheme default is light, which matches SSR defaultTheme="light"
