@@ -38,7 +38,7 @@ export default async function Home() {
   return (
     <div className="site-bg flex min-h-screen flex-col relative">
       {/* ── Fixed Ambient Gold Lighting Layer (Spans full page smoothly) ── */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 z-0">
         {/* Subtle top-center gold aura */}
         <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] rounded-full bg-amber-500/8 dark:bg-amber-500/8 blur-[160px]" />
         {/* Subtle middle ambient gold glow */}

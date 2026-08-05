@@ -205,7 +205,6 @@
   background-image: 
     radial-gradient(ellipse 80% 40% at 50% 0%, rgba(180, 83, 9, 0.12) 0%, transparent 60%),
     radial-gradient(ellipse 60% 30% at 80% 60%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
-  background-attachment: fixed;
 }
 
 .dark .site-bg {
@@ -213,7 +212,6 @@
   background-image: 
     radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
     radial-gradient(ellipse 60% 30% at 80% 60%, rgba(180, 83, 9, 0.06) 0%, transparent 50%) !important;
-  background-attachment: fixed !important;
 }
 
 /* Fine grid */
