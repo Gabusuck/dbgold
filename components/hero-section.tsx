@@ -272,7 +272,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
             {/* ── Right: Simulator ── */}
             <div className="w-full">
                 <div
-                  className="rounded-3xl p-[1px] anim-border-shim"
+                  className="rounded-3xl p-[1px]"
                   style={{
                     background: `linear-gradient(135deg, ${accent}55, ${light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'}, ${accent}25)`,
                     boxShadow: `0 0 80px ${accent}15, 0 32px 64px ${light ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.5)'}`,
