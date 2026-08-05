@@ -29,7 +29,7 @@ export function ScrollReveal({
           observer.unobserve(el)
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0.02, rootMargin: '0px 0px 150px 0px' }
     )
 
     observer.observe(el)
@@ -39,21 +39,20 @@ export function ScrollReveal({
   const getHiddenStyle = (): CSSProperties => {
     switch (variant) {
       case 'zoom-in':
-        return { opacity: 0, transform: 'scale(0.75) translateY(40px)', filter: 'blur(8px)' }
+        return { opacity: 0, transform: 'scale(0.96)' }
       case 'slide-right':
-        return { opacity: 0, transform: 'translateX(-70px)', filter: 'blur(6px)' }
+        return { opacity: 0, transform: 'translateX(-24px)' }
       case 'slide-left':
-        return { opacity: 0, transform: 'translateX(70px)', filter: 'blur(6px)' }
+        return { opacity: 0, transform: 'translateX(24px)' }
       case 'fade-up':
       default:
-        return { opacity: 0, transform: 'translateY(60px) scale(0.94)', filter: 'blur(6px)' }
+        return { opacity: 0, transform: 'translateY(20px)' }
     }
   }
 
   const visibleStyle: CSSProperties = {
     opacity: 1,
     transform: 'translateX(0) translateY(0) scale(1)',
-    filter: 'blur(0px)',
   }
 
   return (
@@ -61,9 +60,9 @@ export function ScrollReveal({
       ref={ref}
       className={className}
       style={{
-        transition: `opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s cubic-bezier(0.16, 1, 0.3, 1)`,
+        transition: `opacity 0.4s ease-out, transform 0.4s ease-out`,
         transitionDelay: `${delay}ms`,
-        willChange: 'opacity, transform, filter',
+        willChange: 'opacity, transform',
         ...(isVisible ? visibleStyle : getHiddenStyle()),
       }}
     >

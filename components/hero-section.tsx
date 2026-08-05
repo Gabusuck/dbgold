@@ -270,8 +270,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
             </ScrollReveal>
 
             {/* ── Right: Simulator ── */}
-            <ScrollReveal variant="slide-left" delay={150}>
-              <div className="w-full">
+            <div className="w-full">
                 <div
                   className="rounded-3xl p-[1px] anim-border-shim"
                   style={{
@@ -483,9 +482,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                   
 
                 </div>
-              </div>
             </div>
-          </ScrollReveal>
 
           </div>
         </div>
