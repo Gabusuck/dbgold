@@ -134,18 +134,13 @@
 .light section,
 .light footer,
 .light main {
-  background: #f5f0e8 !important;
+  background: transparent;
 }
 
 /* Dark overlay divs inside sections */
 .light .bg-\[\#111\],
 .light .bg-\[\#000\] {
   background-color: #f5f0e8 !important;
-}
-
-/* Absolute inset background layers */
-.light .absolute.inset-0 {
-  background: transparent !important;
 }
 
 /* ── Text ── */
