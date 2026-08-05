@@ -13,7 +13,7 @@ export function SiteFooter({ settings }: { settings: GoldSettings }) {
 
   const light = resolvedTheme !== 'dark'
 
-  const bg = light ? '#ede8dc' : '#000000'
+  const bg = 'transparent'
   const topGlow = light
     ? 'linear-gradient(90deg, transparent 0%, rgba(180,83,9,0.25) 50%, transparent 100%)'
     : 'linear-gradient(90deg, transparent 0%, rgba(251,191,36,0.4) 50%, transparent 100%)'

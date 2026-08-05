@@ -12,6 +12,7 @@ import {
 } from '@/lib/gold'
 import type { PriceHistoryEntry } from '@/app/actions'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { ScrollReveal } from './scroll-reveal'
 
 /* ─── Interactive SVG Chart ─── */
 function PriceChart({
@@ -57,9 +58,9 @@ function PriceChart({
   const sliceW = cW / Math.max(values.length - 1, 1)
 
   const cardBg = light
-    ? `linear-gradient(135deg, ${accentColor}12 0%, rgba(255, 255, 255, 0.85) 100%)`
-    : `linear-gradient(135deg, ${accentColor}06 0%, rgba(10,10,10,0.9) 100%)`
-  const cardBorder = light ? `${accentColor}28` : `${accentColor}18`
+    ? `linear-gradient(135deg, ${accentColor}12 0%, rgba(255, 255, 255, 0.95) 100%)`
+    : `linear-gradient(135deg, ${accentColor}15 0%, rgba(20, 20, 28, 0.92) 100%)`
+  const cardBorder = light ? `${accentColor}35` : `${accentColor}35`
   const gridLine = light ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)'
   const dotFill = light ? '#f0ece4' : '#0d0d0d'
   const textPrimary = light ? '#1a1208' : '#ffffff'
@@ -201,8 +202,10 @@ function MetalTable({
   rows: { name: string; sub: string; official: string; pays: string }[]
   light: boolean
 }) {
-  const cardBg = light ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.02)'
-  const cardBorder = light ? `${accentColor}25` : `${accentColor}15`
+  const cardBg = light 
+    ? 'rgba(255,255,255,0.95)' 
+    : 'linear-gradient(135deg, rgba(22, 20, 18, 0.96) 0%, rgba(18, 16, 14, 0.98) 100%)'
+  const cardBorder = light ? `${accentColor}35` : `${accentColor}30`
   const headerBg = light
     ? `linear-gradient(90deg, ${accentColor}10 0%, transparent 100%)`
     : `linear-gradient(90deg, ${accentColor}08 0%, transparent 100%)`
@@ -301,7 +304,7 @@ export function PriceTable({
     pays: formatEUR(payPricePerGram(settings.price_per_gram_silver_999 ?? 1, settings.discount_per_gram_silver ?? 0.15, s.purity)),
   }))
 
-  const bg = light ? '#f5f0e8' : '#111111'
+  const bg = 'transparent'
   const textPrimary = light ? '#1a1208' : '#ffffff'
   const textMuted = light ? '#8a7058' : '#71717a'
   const badgeBg = light ? 'rgba(180,83,9,0.07)' : 'rgba(251,191,36,0.07)'
@@ -394,71 +397,83 @@ export function PriceTable({
         {/* Tables */}
         {settings.price_per_gram_24k > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
-            <MetalTable
-              label="Ouro — cotações por quilate"
-              accentColor="#d97706"
-              rows={goldRows}
-              light={light}
-            />
-            <MetalTable
-              label="Prata — cotações por pureza"
-              accentColor="#64748b"
-              rows={silverRows}
-              light={light}
-            />
+            <ScrollReveal variant="slide-right" delay={100}>
+              <MetalTable
+                label="Ouro — cotações por quilate"
+                accentColor="#d97706"
+                rows={goldRows}
+                light={light}
+              />
+            </ScrollReveal>
+            <ScrollReveal variant="slide-left" delay={200}>
+              <MetalTable
+                label="Prata — cotações por pureza"
+                accentColor="#64748b"
+                rows={silverRows}
+                light={light}
+              />
+            </ScrollReveal>
           </div>
         ) : (
-          <div
-            className="rounded-2xl py-16 px-6 text-center max-w-lg mx-auto flex flex-col items-center gap-4"
-            style={{ background: emptyCardBg, border: `1px solid ${emptyCardBorder}` }}
-          >
+          <ScrollReveal variant="zoom-in" delay={100}>
             <div
-              className="h-12 w-12 rounded-2xl flex items-center justify-center"
-              style={{ background: badgeBg, border: `1px solid ${badgeBorder}` }}
+              className="rounded-2xl py-16 px-6 text-center max-w-lg mx-auto flex flex-col items-center gap-4"
+              style={{ background: emptyCardBg, border: `1px solid ${emptyCardBorder}` }}
             >
-              <svg className="h-6 w-6 text-amber-600/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
+              <div
+                className="h-12 w-12 rounded-2xl flex items-center justify-center"
+                style={{ background: badgeBg, border: `1px solid ${badgeBorder}` }}
+              >
+                <svg className="h-6 w-6 text-amber-600/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold" style={{ color: textPrimary }}>Cotações Indisponíveis</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: textMuted }}>
+                  As tabelas de referência e cotações por quilate estarão visíveis assim que definir os preços de referência na área reservada (cadeado no rodapé).
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-semibold" style={{ color: textPrimary }}>Cotações Indisponíveis</h3>
-              <p className="mt-2 text-xs leading-relaxed" style={{ color: textMuted }}>
-                As tabelas de referência e cotações por quilate estarão visíveis assim que definir os preços de referência na área reservada (cadeado no rodapé).
-              </p>
-            </div>
-          </div>
+          </ScrollReveal>
         )}
 
         {/* Charts */}
         {priceHistory.length >= 2 ? (
           <div className="flex flex-col gap-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold" style={{ color: textPrimary }}>Evolução dos Últimos 10 Dias</h3>
-              <p className="mt-2 text-sm" style={{ color: textMuted }}>
-                Passe o rato sobre o gráfico para explorar cada registo
-              </p>
-            </div>
+            <ScrollReveal variant="fade-up">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold" style={{ color: textPrimary }}>Evolução dos Últimos 10 Dias</h3>
+                <p className="mt-2 text-sm" style={{ color: textMuted }}>
+                  Passe o rato sobre o gráfico para explorar cada registo
+                </p>
+              </div>
+            </ScrollReveal>
             <div className="grid gap-6 md:grid-cols-2">
-              <PriceChart
-                title="Ouro 24K"
-                values={goldVals}
-                dates={dates}
-                strokeColor="#d97706"
-                gradientId="gold-grad"
-                accentColor="#d97706"
-                light={light}
-              />
-              <PriceChart
-                title="Prata 999"
-                values={silverVals}
-                dates={dates}
-                strokeColor="#64748b"
-                gradientId="silver-grad"
-                accentColor="#64748b"
-                light={light}
-              />
+              <ScrollReveal variant="slide-right" delay={150}>
+                <PriceChart
+                  title="Ouro 24K"
+                  values={goldVals}
+                  dates={dates}
+                  strokeColor="#d97706"
+                  gradientId="gold-grad"
+                  accentColor="#d97706"
+                  light={light}
+                />
+              </ScrollReveal>
+              <ScrollReveal variant="slide-left" delay={300}>
+                <PriceChart
+                  title="Prata 999"
+                  values={silverVals}
+                  dates={dates}
+                  strokeColor="#64748b"
+                  gradientId="silver-grad"
+                  accentColor="#64748b"
+                  light={light}
+                />
+              </ScrollReveal>
             </div>
           </div>
         ) : (

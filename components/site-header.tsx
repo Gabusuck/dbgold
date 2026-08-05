@@ -37,14 +37,14 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        'sticky top-3 mt-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl transition-all duration-500 md:top-4 md:mt-1 md:w-[calc(100%-4rem)]',
+        'fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl rounded-2xl transition-all duration-500 md:top-4 md:w-[calc(100%-4rem)]',
         scrolled
           ? isLight
-            ? 'shadow-[0_2px_12px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.05)]'
-            : 'shadow-[0_8px_40px_rgba(0,0,0,0.8),0_0_0_1px_rgba(251,191,36,0.12)]'
+            ? 'shadow-[0_2px_12px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.06)]'
+            : 'shadow-[0_8px_40px_rgba(0,0,0,0.8),0_0_0_1px_rgba(251,191,36,0.18)]'
           : isLight
             ? 'shadow-[0_0_0_1px_rgba(0,0,0,0.04)]'
-            : 'shadow-[0_0_0_1px_rgba(255,255,255,0.06)]'
+            : 'shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
       )}
       style={{
         background: isLight ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.5)',

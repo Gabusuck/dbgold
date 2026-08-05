@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { createReadClient, createAdminClient } from '@/lib/supabase/server'
 import type { GoldSettings } from '@/lib/gold'
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'dbgold2026'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'ouro2026'
 
 const DEFAULT_SETTINGS: GoldSettings = {
   price_per_gram_24k: 0,

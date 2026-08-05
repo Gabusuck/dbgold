@@ -13,6 +13,7 @@ import {
 import { Trash2, TrendingUp, TrendingDown, Minus, Scale, ChevronDown, ChevronUp } from 'lucide-react'
 import type { PriceHistoryEntry } from '@/app/actions'
 import { toast } from 'sonner'
+import { ScrollReveal } from './scroll-reveal'
 
 type HistoryItem = {
   id: string
@@ -142,11 +143,11 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   const accent = isGold ? '#f59e0b' : '#64748b'
 
   // ── Light-mode palette tokens ──
-  const bg = light ? '#fdf8f0' : '#111111'
-  const cardBg = light ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.03)'
-  const cardBorder = light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'
-  const panelBg = light ? 'rgba(255,255,255,0.7)' : 'rgba(20,20,20,0.95)'
-  const panelBorder = light ? 'rgba(0,0,0,0.09)' : 'rgba(255,255,255,0.07)'
+  const bg = 'transparent'
+  const cardBg = light ? 'rgba(255,255,255,0.95)' : 'rgba(22, 20, 18, 0.90)'
+  const cardBorder = light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
+  const panelBg = light ? 'rgba(255,255,255,0.92)' : 'rgba(20, 18, 16, 0.96)'
+  const panelBorder = light ? 'rgba(180,83,9,0.2)' : 'rgba(245,158,11,0.22)'
   const inputBg = light ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'
   const inputBorder = light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.10)'
   const toggleBg = light ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)'
@@ -173,29 +174,11 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
       {/* Background decoration */}
       {!light && (
         <>
-          <div
-            className="absolute inset-x-0 opacity-[0.45]"
-            style={{
-              top: '35%', bottom: '20%',
-              backgroundImage: 'radial-gradient(circle, rgba(251,191,36,0.22) 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
-            }}
-          />
           <div className="anim-float-slow absolute top-[40%] left-[5%] h-80 w-80 rounded-full opacity-[0.06] blur-[100px] pointer-events-none"
             style={{ background: 'radial-gradient(circle, #fbbf24 0%, transparent 70%)' }} />
           <div className="anim-float-med absolute bottom-24 right-[8%] h-60 w-60 rounded-full opacity-[0.05] blur-[80px] pointer-events-none"
             style={{ background: 'radial-gradient(circle, #d97706 0%, transparent 70%)' }} />
         </>
-      )}
-      {light && (
-        <div
-          className="absolute inset-x-0 opacity-[0.85] pointer-events-none"
-          style={{
-            top: '30%', bottom: '15%',
-            backgroundImage: 'radial-gradient(circle, rgba(120,80,40,0.22) 1.2px, transparent 1.2px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
       )}
 
       {/* Content */}
@@ -204,90 +187,99 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
           <div className="grid gap-12 lg:grid-cols-2 items-center">
 
             {/* ── Left: Hero copy ── */}
-            <div className="flex flex-col gap-6 md:gap-8">
-              <div className="anim-fade-up">
-                <span className="inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-600 glass-gold">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+            <ScrollReveal variant="slide-right">
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div>
+                  <span className="inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-600 glass-gold">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                    </span>
+                    Cotações Actualizadas
                   </span>
-                  Cotações Actualizadas
-                </span>
-              </div>
+                </div>
 
-              <div className="anim-fade-up-1">
-                <h1
-                  className="font-bold leading-[1.08] tracking-tight text-4xl md:text-6xl lg:text-[5rem]"
-                  style={{ color: textPrimary }}
-                >
-                  Compramos<br />
-                  <span className="text-shimmer">Ouro &amp; Prata</span><br />
-                  <span className="font-light text-3xl md:text-5xl lg:text-6xl italic" style={{ color: textSecondary }}>ao melhor preço.</span>
-                </h1>
-              </div>
+                <div>
+                  <h1
+                    className="font-bold leading-[1.08] tracking-tight text-4xl md:text-6xl lg:text-[5rem]"
+                    style={{ color: textPrimary }}
+                  >
+                    Compramos<br />
+                    <span className="text-shimmer">Ouro &amp; Prata</span><br />
+                    <span className="font-light text-3xl md:text-5xl lg:text-6xl italic" style={{ color: textSecondary }}>ao melhor preço.</span>
+                  </h1>
+                </div>
 
-              <p className="anim-fade-up-2 text-[15px] max-w-md leading-[1.75]" style={{ color: textSecondary }}>
-                Avaliação técnica profissional com cotações oficiais diárias e pagamento imediato em mão.
-              </p>
+                <p className="text-[15px] max-w-md leading-[1.75]" style={{ color: textSecondary }}>
+                  Avaliação técnica profissional com cotações oficiais diárias e pagamento imediato em mão.
+                </p>
 
-              {/* Live price cards */}
-              <div className="anim-fade-up-3 grid grid-cols-2 gap-3 max-w-sm">
-                <div
-                  className="glass rounded-2xl p-3 md:p-4 anim-glow-pulse"
-                  style={{
-                    borderColor: light ? 'rgba(180,83,9,0.2)' : 'rgba(251,191,36,0.18)'
-                  }}
-                >
-                  <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600/80 mb-2">Ouro 24K</div>
-                  <div className="text-xl xs:text-2xl font-bold text-amber-500 font-mono">
-                    {liveSettings.price_per_gram_24k > 0 ? formatEUR(liveSettings.price_per_gram_24k) : 'Sob Consulta'}
+                {/* Live price cards */}
+                <div className="grid grid-cols-2 gap-3 max-w-sm">
+                  <div
+                    className="glass rounded-2xl p-3 md:p-4 anim-glow-pulse"
+                    style={{
+                      borderColor: light ? 'rgba(180,83,9,0.2)' : 'rgba(251,191,36,0.18)',
+                      animation: 'heroFadeSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both',
+                    }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600/80 mb-2">Ouro 24K</div>
+                    <div className="text-xl xs:text-2xl font-bold text-amber-500 font-mono">
+                      {liveSettings.price_per_gram_24k > 0 ? formatEUR(liveSettings.price_per_gram_24k) : 'Sob Consulta'}
+                    </div>
+                    <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
+                      {goldIsUp === null ? (
+                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                      ) : goldIsUp ? (
+                        <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    {goldIsUp === null ? (
-                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
-                    ) : goldIsUp ? (
-                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
-                    )}
+                  <div
+                    className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse"
+                    style={{
+                      animation: 'heroFadeSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both',
+                    }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-2" style={{ color: textMuted }}>Prata 999</div>
+                    <div className="text-xl xs:text-2xl font-bold font-mono" style={{ color: light ? '#475569' : '#e2e8f0' }}>
+                      {liveSettings.price_per_gram_silver_999 && liveSettings.price_per_gram_silver_999 > 0
+                        ? formatEUR(liveSettings.price_per_gram_silver_999)
+                        : 'Sob Consulta'}
+                    </div>
+                    <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
+                      {silverIsUp === null ? (
+                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
+                      ) : silverIsUp ? (
+                        <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse">
-                  <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-2" style={{ color: textMuted }}>Prata 999</div>
-                  <div className="text-xl xs:text-2xl font-bold font-mono" style={{ color: light ? '#475569' : '#e2e8f0' }}>
-                    {liveSettings.price_per_gram_silver_999 && liveSettings.price_per_gram_silver_999 > 0
-                      ? formatEUR(liveSettings.price_per_gram_silver_999)
-                      : 'Sob Consulta'}
-                  </div>
-                  <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                    {silverIsUp === null ? (
-                      <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
-                    ) : silverIsUp ? (
-                      <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
-                    )}
-                  </div>
+
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs border-t pt-5" style={{ borderColor: dividerColor, color: textFaint }}>
+                  {['✓ Sem comissões ocultas', '✓ Avaliação presencial', '✓ Fecho no próprio dia'].map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
                 </div>
               </div>
-
-              <div className="anim-fade-up-4 flex flex-wrap gap-x-6 gap-y-2 text-xs border-t pt-5" style={{ borderColor: dividerColor, color: textFaint }}>
-                {['✓ Sem comissões ocultas', '✓ Avaliação presencial', '✓ Fecho no próprio dia'].map((t) => (
-                  <span key={t}>{t}</span>
-                ))}
-              </div>
-            </div>
+            </ScrollReveal>
 
             {/* ── Right: Simulator ── */}
-            <div className="anim-slide-right w-full">
-              <div
-                className="rounded-3xl p-[1px] anim-border-shim"
-                style={{
-                  background: `linear-gradient(135deg, ${accent}55, ${light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'}, ${accent}25)`,
-                  boxShadow: `0 0 80px ${accent}15, 0 32px 64px ${light ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.5)'}`,
-                }}
-              >
-                <div className="rounded-[23px] p-4 md:p-7" style={{ background: panelBg, border: `1px solid ${panelBorder}` }}>
+            <ScrollReveal variant="slide-left" delay={150}>
+              <div className="w-full">
+                <div
+                  className="rounded-3xl p-[1px] anim-border-shim"
+                  style={{
+                    background: `linear-gradient(135deg, ${accent}55, ${light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'}, ${accent}25)`,
+                    boxShadow: `0 0 80px ${accent}15, 0 32px 64px ${light ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.5)'}`,
+                  }}
+                >
+                  <div className="rounded-[23px] p-4 md:p-7" style={{ background: panelBg, border: `1px solid ${panelBorder}` }}>
 
                   {/* Header */}
                   <div className="flex items-center justify-between mb-5">
@@ -407,9 +399,9 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     className="mb-5 rounded-2xl overflow-hidden"
                     style={{ border: `1px solid ${accent}20` }}
                   >
-                    <div className="p-4 text-center" style={{ background: breakdownBg }}>
-                      <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: textMuted }}>Recebe</div>
-                      <div className="text-4xl font-bold font-mono tracking-tight" style={{ color: isGold ? '#d97706' : (light ? '#475569' : '#e2e8f0') }}>
+                    <div className="p-4 md:p-6 text-center" style={{ background: breakdownBg }}>
+                      <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: textMuted }}>Recebe Aproximadamente</div>
+                      <div className="text-4xl md:text-5xl font-bold font-mono tracking-tight" style={{ color: isGold ? '#d97706' : (light ? '#475569' : '#e2e8f0') }}>
                         {formatEUR(activeParams.total)}
                       </div>
                     </div>
@@ -493,6 +485,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 </div>
               </div>
             </div>
+          </ScrollReveal>
 
           </div>
         </div>

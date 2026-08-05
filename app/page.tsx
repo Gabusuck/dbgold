@@ -3,6 +3,7 @@ import { HeroSection } from '@/components/hero-section'
 import { PriceTable } from '@/components/price-table'
 import { WhatsappSection } from '@/components/whatsapp-section'
 import { SiteFooter } from '@/components/site-footer'
+import { BrandHero } from '@/components/brand-hero'
 import { Toaster } from '@/components/ui/sonner'
 import { getSettings, getPriceHistory } from '@/app/actions'
 import { formatEUR, payPricePerGram } from '@/lib/gold'
@@ -35,34 +36,19 @@ export default async function Home() {
   ]
 
   return (
-    <div className="site-bg flex min-h-screen flex-col">
-
-      {/* ── Ticker bar — pinned at very top, above everything ── */}
-      <div className="ticker-wrap py-2">
-        <div className="ticker-inner anim-ticker gap-12 text-[11px] font-mono tracking-wider">
-          {[0, 1].map((repeat) => (
-            <span key={repeat} className="inline-flex gap-12 mr-12">
-              {tickerItems.map((item, i) => (
-                <span
-                  key={i}
-                  className={
-                    item.startsWith('✦') ? 'text-amber-600 dark:text-amber-400 font-bold' :
-                    item.startsWith('◈') ? 'text-slate-600 dark:text-zinc-300 font-bold' :
-                    item === '·' ? 'text-stone-400 dark:text-zinc-700 font-bold' :
-                    'text-stone-600 dark:text-zinc-500 font-semibold'
-                  }
-                >
-                  {item}
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
+    <div className="site-bg flex min-h-screen flex-col relative">
+      {/* ── Fixed Ambient Gold Lighting Layer (Spans full page smoothly) ── */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {/* Subtle top-center gold aura */}
+        <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] rounded-full bg-amber-500/8 dark:bg-amber-500/8 blur-[160px]" />
+        {/* Subtle middle ambient gold glow */}
+        <div className="absolute top-[45%] left-1/2 -translate-x-1/2 w-[1200px] h-[700px] rounded-full bg-amber-600/5 dark:bg-amber-500/5 blur-[200px]" />
       </div>
 
       <SiteHeader />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pt-20">
+        <BrandHero />
         <HeroSection settings={settings} priceHistory={history} />
         <PriceTable settings={settings} priceHistory={history} />
         <WhatsappSection />
