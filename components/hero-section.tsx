@@ -483,6 +483,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 </div>
             </div>
+            </div>
 
           </div>
         </div>
