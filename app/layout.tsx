@@ -37,7 +37,8 @@ export default function RootLayout({
   return (
     <html lang="pt" className={`light ${playfair.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
-        <Script src="https://js.ptengine.com/4378uf5z.js" strategy="afterInteractive" />
+        {/* Ptengine Tag */}
+        <script src="https://js.ptengine.com/4378uf5z.js" defer />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
