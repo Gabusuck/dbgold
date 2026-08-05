@@ -115,7 +115,7 @@ export function AdminDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="light sm:max-w-md max-h-[90vh] overflow-y-auto bg-white text-stone-900">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5 text-primary" />
@@ -172,14 +172,14 @@ export function AdminDialog({
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="discount" className="text-xs">Desconto Ouro</Label>
-                    <div className="flex rounded-md bg-zinc-800 p-0.5 text-[9px] font-black">
+                    <div className="flex rounded-md bg-stone-100 border border-stone-200 p-0.5 text-[9px] font-black">
                       <button
                         type="button"
                         onClick={() => setGoldDiscountType('fixed')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           goldDiscountType === 'fixed'
                             ? 'bg-amber-500 text-amber-950'
-                            : 'text-zinc-400 hover:text-zinc-200'
+                            : 'text-stone-400 hover:text-stone-700'
                         }`}
                       >
                         €/g
@@ -190,7 +190,7 @@ export function AdminDialog({
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           goldDiscountType === 'percent'
                             ? 'bg-amber-500 text-amber-950'
-                            : 'text-zinc-400 hover:text-zinc-200'
+                            : 'text-stone-400 hover:text-stone-700'
                         }`}
                       >
                         %
@@ -218,7 +218,7 @@ export function AdminDialog({
 
             {/* Prata Settings */}
             <div className="border-b border-border/60 pb-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">Definições de Prata</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Definições de Prata</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="price-silver" className="text-xs">Preço Prata 999 (€/g)</Label>
@@ -235,14 +235,14 @@ export function AdminDialog({
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="discount-silver" className="text-xs">Desconto Prata</Label>
-                    <div className="flex rounded-md bg-zinc-800 p-0.5 text-[9px] font-black">
+                    <div className="flex rounded-md bg-stone-100 border border-stone-200 p-0.5 text-[9px] font-black">
                       <button
                         type="button"
                         onClick={() => setSilverDiscountType('fixed')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           silverDiscountType === 'fixed'
                             ? 'bg-amber-500 text-amber-950'
-                            : 'text-zinc-400 hover:text-zinc-200'
+                            : 'text-stone-400 hover:text-stone-700'
                         }`}
                       >
                         €/g
@@ -253,7 +253,7 @@ export function AdminDialog({
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           silverDiscountType === 'percent'
                             ? 'bg-amber-500 text-amber-950'
-                            : 'text-zinc-400 hover:text-zinc-200'
+                            : 'text-stone-400 hover:text-stone-700'
                         }`}
                       >
                         %
