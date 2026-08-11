@@ -12,6 +12,6 @@ Write-Host "`n2. Adding NEXT_PUBLIC_SUPABASE_ANON_KEY..."
 
 # Adicionar SUPABASE_SERVICE_ROLE_KEY (sensitive, production only)
 Write-Host "`n3. Adding SUPABASE_SERVICE_ROLE_KEY..."
-"y`nsb_secret_87d_wQZncS6tFx9s-YTf5g_8kQLLfr7`n1" | npx vercel env add SUPABASE_SERVICE_ROLE_KEY
+"y`neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHFncXdxbGxicHhwYm5vaHdvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzM3MzczNiwiZXhwIjoyMDk4OTQ5NzM2fQ.wKnHaw95k6iiU9L6HTMQ1o6rynRamCAU6nRJxpE232s`n1" | npx vercel env add SUPABASE_SERVICE_ROLE_KEY
 
 Write-Host "`nDone! Environment variables added successfully." -ForegroundColor Green

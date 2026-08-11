@@ -10,7 +10,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
 }
 
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_87d_wQZncS6tFx9s-YTf5g_8kQLLfr7'
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHFncXdxbGxicHhwYm5vaHdvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzM3MzczNiwiZXhwIjoyMDk4OTQ5NzM2fQ.wKnHaw95k6iiU9L6HTMQ1o6rynRamCAU6nRJxpE232s'
 }
 
 console.log('[ENV INIT] Supabase env vars initialized')
