@@ -24,6 +24,7 @@ export type SilverPurity = {
 export const KARATS: Karat[] = [
   { label: '24 quilates', karat: 24, purity: 0.999 },
   { label: '22 quilates', karat: 22, purity: 0.916 },
+  { label: '19.2 quilates (Português)', karat: 19.2, purity: 0.8 },
   { label: '18 quilates', karat: 18, purity: 0.75 },
   { label: '14 quilates', karat: 14, purity: 0.585 },
   { label: '9 quilates', karat: 9, purity: 0.375 },

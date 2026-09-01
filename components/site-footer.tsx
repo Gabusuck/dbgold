@@ -135,7 +135,7 @@ export function SiteFooter({ settings }: { settings: GoldSettings }) {
             </a>
             <span className="flex items-start gap-2 text-sm" style={{ color: textMuted }}>
               <MapPin className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" style={{ color: light ? '#b45309' : 'rgba(245,158,11,0.6)' }} />
-              <span>Rua do Ouro, 100<br />Lisboa, Portugal</span>
+              <span>Viseu, Portugal</span>
             </span>
           </div>
 
