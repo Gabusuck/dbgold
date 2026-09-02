@@ -1,0 +1,20 @@
+name: Atualizar Cotacoes (Fixing de Londres)
+
+on:
+  schedule:
+    # 10:35 UTC (Segunda a Sexta) - Logo apos o Fixing AM do Ouro (10:30)
+    - cron: '35 10 * * 1-5'
+    # 12:05 UTC (Segunda a Sexta) - Logo apos o Fixing da Prata (12:00)
+    - cron: '5 12 * * 1-5'
+    # 15:05 UTC (Segunda a Sexta) - Logo apos o Fixing PM do Ouro (15:00)
+    - cron: '5 15 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update-fixing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar endpoint de atualizacao das cotacoes
+        run: |
+          echo "Disparando atualizacao das cotacoes do Fixing de Londres..."
+          curl -f -sS -X GET "https://dbgold.pt/api/cron/update-prices"
