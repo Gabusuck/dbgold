@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, LogIn, Save } from 'lucide-react'
+import { Lock, LogIn, Save, RefreshCw } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { updateSettings, verifyPassword } from '@/app/actions'
+import { updateSettings, verifyPassword, syncLondonFixing } from '@/app/actions'
 import { type GoldSettings } from '@/lib/gold'
 
 export function AdminDialog({
@@ -112,6 +112,28 @@ export function AdminDialog({
     })
   }
 
+  const [syncing, setSyncing] = useState(false)
+
+  async function handleSyncFixing() {
+    setSyncing(true)
+    try {
+      const res = await syncLondonFixing(password)
+      if (res.ok) {
+        toast.success(res.message)
+        if (res.fixing) {
+          setPrice(String(res.fixing.goldPricePerGram24k))
+          setPriceSilver(String(res.fixing.silverPricePerGram999))
+        }
+        router.refresh()
+      } else {
+        toast.error(res.message)
+      }
+    } catch (e) {
+      toast.error('Erro ao sincronizar com o Fixing de Londres.')
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -153,6 +175,29 @@ export function AdminDialog({
           </div>
         ) : (
           <div className="flex flex-col gap-4">
+            {/* Sincronização direta com Fixing de Londres */}
+            <div className="bg-amber-50/80 border border-amber-500/25 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Fixing de Londres (LBMA)
+                </span>
+                <span className="text-[11px] text-stone-600 mt-0.5">
+                  Atualiza as cotações de Ouro 24K e Prata 999 em tempo real.
+                </span>
+              </div>
+              <Button
+                type="button"
+                onClick={handleSyncFixing}
+                disabled={syncing || pending}
+                variant="outline"
+                className="h-8 px-3 text-xs font-bold gap-1.5 border-amber-600/30 text-amber-950 bg-white hover:bg-amber-100/60 shrink-0"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'A atualizar...' : 'Sincronizar'}
+              </Button>
+            </div>
+
             {/* Ouro Settings */}
             <div className="border-b border-border/60 pb-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-amber-500 mb-3">Definições de Ouro</h4>

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { createReadClient, createAdminClient } from '@/lib/supabase/server'
 import type { GoldSettings } from '@/lib/gold'
+import { fetchLatestLondonFixing } from '@/lib/lbma'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'ouro2026'
 
@@ -334,3 +335,52 @@ export async function updateSettings(input: {
 export async function verifyPassword(password: string): Promise<boolean> {
   return password === ADMIN_PASSWORD
 }
+
+export async function syncLondonFixing(password?: string): Promise<{
+  ok: boolean
+  message: string
+  fixing?: {
+    goldPricePerGram24k: number
+    silverPricePerGram999: number
+    date: string
+    goldFixingType: 'AM' | 'PM'
+  }
+}> {
+  if (password && password !== ADMIN_PASSWORD) {
+    return { ok: false, message: 'Password incorreta.' }
+  }
+
+  const fixing = await fetchLatestLondonFixing()
+  if (!fixing.success) {
+    return { ok: false, message: `Falha ao obter cotação do Fixing de Londres: ${fixing.error}` }
+  }
+
+  // Obter definições atuais para preservar as margens/descontos configurados
+  const currentSettings = await getSettings()
+  const discountGold = currentSettings.discount_per_gram
+  const discountSilver = currentSettings.discount_per_gram_silver
+
+  const res = await updateSettings({
+    password: ADMIN_PASSWORD,
+    price_per_gram_24k: fixing.goldPricePerGram24k,
+    discount_per_gram: discountGold,
+    price_per_gram_silver_999: fixing.silverPricePerGram999,
+    discount_per_gram_silver: discountSilver,
+  })
+
+  if (res.ok) {
+    return {
+      ok: true,
+      message: `Fixing ${fixing.goldFixingType} (${fixing.date}) sincronizado: Ouro 24K a ${fixing.goldPricePerGram24k.toFixed(2)} €/g e Prata a ${fixing.silverPricePerGram999.toFixed(2)} €/g.`,
+      fixing: {
+        goldPricePerGram24k: fixing.goldPricePerGram24k,
+        silverPricePerGram999: fixing.silverPricePerGram999,
+        date: fixing.date,
+        goldFixingType: fixing.goldFixingType,
+      },
+    }
+  }
+
+  return { ok: false, message: res.message }
+}
+
