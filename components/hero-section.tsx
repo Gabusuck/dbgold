@@ -263,7 +263,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 <div className="flex items-center gap-2 text-xs py-0.5" style={{ color: textSecondary }}>
                   <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                  <span>Atualização diária nos horários do Fixing de Londres: <strong>10h30</strong> e <strong>15h00</strong> (Ouro) | <strong>12h00</strong> (Prata)</span>
+                  <span>Atualização diária nos dias úteis às <strong>16h00</strong> (Fixing de Londres: Ouro e Prata)</span>
                 </div>
 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs border-t pt-5" style={{ borderColor: dividerColor, color: textFaint }}>

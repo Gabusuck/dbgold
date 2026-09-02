@@ -364,7 +364,7 @@ export function PriceTable({
             Valores de <span className="text-shimmer">Referência</span>
           </h2>
           <p className="mt-4 text-sm max-w-lg mx-auto leading-relaxed" style={{ color: textMuted }}>
-            Cotações oficiais baseadas no <strong>Fixing de Londres (LBMA)</strong>. Atualizadas nos dias úteis às <strong>10h30</strong> e <strong>15h00</strong> (Ouro) e às <strong>12h00</strong> (Prata).
+            Cotações oficiais baseadas no <strong>Fixing de Londres (LBMA)</strong>. Atualizadas nos dias úteis às <strong>16h00</strong> (após o fecho oficial de Ouro e Prata).
           </p>
           <a
             href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices"
