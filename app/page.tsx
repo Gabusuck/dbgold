@@ -29,6 +29,8 @@ export default async function Home() {
     `·`,
     `◈ PRATA 999: ${formatEUR(settings.price_per_gram_silver_999 ?? 1)}/g`,
     `·`,
+    `✦ ATUALIZAÇÃO DIÁRIA (FIXING DE LONDRES: 10H30, 12H00 E 15H00)`,
+    `·`,
     `✦ AVALIAÇÃO RIGOROSA E PRESENCIAL`,
     `·`,
     `✦ PAGAMENTO NO PRÓPRIO DIA`,

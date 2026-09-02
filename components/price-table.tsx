@@ -363,14 +363,11 @@ export function PriceTable({
           <h2 className="text-4xl font-bold md:text-5xl tracking-tight" style={{ color: textPrimary }}>
             Valores de <span className="text-shimmer">Referência</span>
           </h2>
-          <p className="mt-4 text-sm max-w-md mx-auto leading-relaxed" style={{ color: textMuted }}>
-            Cotações por grama líquidas, actualizadas a{' '}
-            {new Date(settings.updated_at).toLocaleDateString('pt-PT', {
-              day: '2-digit', month: 'long', year: 'numeric'
-            })}.
+          <p className="mt-4 text-sm max-w-lg mx-auto leading-relaxed" style={{ color: textMuted }}>
+            Cotações oficiais baseadas no <strong>Fixing de Londres (LBMA)</strong>. Atualizadas nos dias úteis às <strong>10h30</strong> e <strong>15h00</strong> (Ouro) e às <strong>12h00</strong> (Prata).
           </p>
           <a
-            href="https://www.kitco.com"
+            href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-opacity hover:opacity-80"
@@ -385,7 +382,7 @@ export function PriceTable({
               <line x1="2" y1="12" x2="22" y2="12" />
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
             </svg>
-            Preços baseados em Kitco.com
+            Fonte Oficial: LBMA (London Bullion Market Association)
             <svg className="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
               <polyline points="15 3 21 3 21 9" />
