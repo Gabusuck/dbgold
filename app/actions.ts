@@ -186,6 +186,40 @@ export async function getSettings(): Promise<GoldSettings> {
     }
   }
 
+  // Auto-sync: check if LBMA has newer fixing prices (throttled to at most once every 15 minutes)
+  try {
+    const lastUpdate = new Date(currentSettings.updated_at).getTime()
+    const now = Date.now()
+    const fifteenMinutes = 15 * 60 * 1000
+
+    if (now - lastUpdate > fifteenMinutes || Number.isNaN(lastUpdate)) {
+      const fixing = await fetchLatestLondonFixing()
+      if (
+        fixing.success &&
+        fixing.goldPricePerGram24k > 0 &&
+        (fixing.goldPricePerGram24k !== currentSettings.price_per_gram_24k ||
+          fixing.silverPricePerGram999 !== currentSettings.price_per_gram_silver_999)
+      ) {
+        console.log('[AUTO-SYNC] Updating DB with latest London fixing:', fixing)
+        const supabase = createAdminClient()
+        await supabase
+          .from('gold_settings')
+          .update({
+            price_per_gram_24k: fixing.goldPricePerGram24k,
+            price_per_gram_silver_999: fixing.silverPricePerGram999,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', 1)
+
+        currentSettings.price_per_gram_24k = fixing.goldPricePerGram24k
+        currentSettings.price_per_gram_silver_999 = fixing.silverPricePerGram999
+        currentSettings.updated_at = new Date().toISOString()
+      }
+    }
+  } catch (e) {
+    console.warn('[AUTO-SYNC] Background check failed:', e)
+  }
+
   return currentSettings
 }
 

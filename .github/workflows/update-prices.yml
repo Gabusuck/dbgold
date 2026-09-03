@@ -2,12 +2,8 @@ name: Atualizar Cotacoes (Fixing de Londres)
 
 on:
   schedule:
-    # 10:35 UTC (Segunda a Sexta) - Logo apos o Fixing AM do Ouro (10:30)
-    - cron: '35 10 * * 1-5'
-    # 12:05 UTC (Segunda a Sexta) - Logo apos o Fixing da Prata (12:00)
-    - cron: '5 12 * * 1-5'
-    # 15:05 UTC (Segunda a Sexta) - Logo apos o Fixing PM do Ouro (15:00)
-    - cron: '5 15 * * 1-5'
+    # Executa a cada hora nos dias uteis entre as 08:35 e as 17:35 UTC
+    - cron: '35 8-17 * * 1-5'
   workflow_dispatch:
 
 jobs:
