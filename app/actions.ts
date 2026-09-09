@@ -200,16 +200,14 @@ export async function getSettings(): Promise<GoldSettings> {
         (fixing.goldPricePerGram24k !== currentSettings.price_per_gram_24k ||
           fixing.silverPricePerGram999 !== currentSettings.price_per_gram_silver_999)
       ) {
-        console.log('[AUTO-SYNC] Updating DB with latest London fixing:', fixing)
-        const supabase = createAdminClient()
-        await supabase
-          .from('gold_settings')
-          .update({
-            price_per_gram_24k: fixing.goldPricePerGram24k,
-            price_per_gram_silver_999: fixing.silverPricePerGram999,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', 1)
+        console.log('[AUTO-SYNC] Updating DB and history with latest London fixing:', fixing)
+        await updateSettings({
+          password: ADMIN_PASSWORD,
+          price_per_gram_24k: fixing.goldPricePerGram24k,
+          discount_per_gram: currentSettings.discount_per_gram,
+          price_per_gram_silver_999: fixing.silverPricePerGram999,
+          discount_per_gram_silver: currentSettings.discount_per_gram_silver,
+        })
 
         currentSettings.price_per_gram_24k = fixing.goldPricePerGram24k
         currentSettings.price_per_gram_silver_999 = fixing.silverPricePerGram999
