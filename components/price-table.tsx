@@ -13,6 +13,7 @@ import {
 import type { PriceHistoryEntry } from '@/app/actions'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { ScrollReveal } from './scroll-reveal'
+import { useLivePrices } from './live-prices'
 
 /* ─── Interactive SVG Chart ─── */
 function PriceChart({
@@ -276,14 +277,15 @@ function MetalTable({
 
 /* ─── Main export ─── */
 export function PriceTable({
-  settings,
-  priceHistory,
+  settings: initialSettings,
+  priceHistory: initialHistory,
 }: {
   settings: GoldSettings
   priceHistory: PriceHistoryEntry[]
 }) {
   const { resolvedTheme } = useTheme()
   const light = resolvedTheme !== 'dark'
+  const { settings, history: priceHistory } = useLivePrices(initialSettings, initialHistory)
 
   const chronological = [...priceHistory].reverse()
   const goldVals = chronological.map((e) => e.price_gold)

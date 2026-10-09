@@ -1,6 +1,7 @@
 import { SiteHeader } from '@/components/site-header'
 import { HeroSection } from '@/components/hero-section'
 import { PriceTable } from '@/components/price-table'
+import { LivePricesProvider } from '@/components/live-prices'
 import { WhatsappSection } from '@/components/whatsapp-section'
 import { SiteFooter } from '@/components/site-footer'
 import { BrandHero } from '@/components/brand-hero'
@@ -51,8 +52,10 @@ export default async function Home() {
 
       <main className="flex-1 flex flex-col pt-20">
         <BrandHero />
-        <HeroSection settings={settings} priceHistory={history} />
-        <PriceTable settings={settings} priceHistory={history} />
+        <LivePricesProvider initialSettings={settings} initialHistory={history}>
+          <HeroSection settings={settings} priceHistory={history} />
+          <PriceTable settings={settings} priceHistory={history} />
+        </LivePricesProvider>
         <WhatsappSection />
       </main>
       <SiteFooter settings={settings} />

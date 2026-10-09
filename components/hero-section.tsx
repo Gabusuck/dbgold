@@ -14,6 +14,7 @@ import { Trash2, TrendingUp, TrendingDown, Minus, Scale, ChevronDown, ChevronUp,
 import type { PriceHistoryEntry } from '@/app/actions'
 import { toast } from 'sonner'
 import { ScrollReveal } from './scroll-reveal'
+import { useLivePrices } from './live-prices'
 
 type HistoryItem = {
   id: string
@@ -45,31 +46,12 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
   const light = resolvedTheme !== 'dark'
 
-  // Live settings state: initialize from server-rendered props, then poll API for updates
-  const [liveSettings, setLiveSettings] = useState<GoldSettings>(settings)
-
-  useEffect(() => {
-    let mounted = true
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/settings')
-        if (!res.ok) return
-        const json = await res.json()
-        if (json?.ok && json.settings && mounted) {
-          setLiveSettings(json.settings)
-        }
-      } catch (e) { /* ignore */ }
-    }
-
-    // initial fetch and interval
-    fetchSettings()
-    const id = setInterval(fetchSettings, 10000) // every 10s
-    return () => { mounted = false; clearInterval(id) }
-  }, [])
+  // Live settings: shared with the price table so every section shows the same value
+  const { settings: liveSettings, history: livePriceHistory } = useLivePrices(settings, priceHistory)
 
   // Determine short-term trend for gold and silver from recent price history
-  const latest = priceHistory && priceHistory.length > 0 ? priceHistory[0] : null
-  const prev = priceHistory && priceHistory.length > 1 ? priceHistory[1] : null
+  const latest = livePriceHistory.length > 0 ? livePriceHistory[0] : null
+  const prev = livePriceHistory.length > 1 ? livePriceHistory[1] : null
   const goldIsUp = latest && prev ? (latest.price_gold - prev.price_gold) > 0 : null
   const silverIsUp = latest && prev ? (latest.price_silver - prev.price_silver) > 0 : null
 
@@ -114,7 +96,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
         officialTotal: official * gramsNum,
       }
     }
-  }, [metalType, selectedGold, selectedSilver, gramsNum, settings])
+  }, [metalType, selectedGold, selectedSilver, gramsNum, liveSettings])
 
   const handleSave = () => {
     if (gramsNum <= 0) { toast.error('Insira um peso válido.'); return }
