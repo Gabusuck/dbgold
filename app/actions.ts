@@ -201,13 +201,43 @@ export async function getSettings(): Promise<GoldSettings> {
           fixing.silverPricePerGram999 !== currentSettings.price_per_gram_silver_999)
       ) {
         console.log('[AUTO-SYNC] Updating DB and history with latest London fixing:', fixing)
-        await updateSettings({
-          password: ADMIN_PASSWORD,
-          price_per_gram_24k: fixing.goldPricePerGram24k,
-          discount_per_gram: currentSettings.discount_per_gram,
-          price_per_gram_silver_999: fixing.silverPricePerGram999,
-          discount_per_gram_silver: currentSettings.discount_per_gram_silver,
-        })
+        
+        // Update Supabase directly instead of calling updateSettings() to avoid cookie/revalidate errors in Server Components
+        try {
+          const supabase = createAdminClient()
+          const timestamp = new Date().toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+          
+          let historyList = []
+          try {
+            const { data } = await supabase.from('price_history').select('*').order('created_at', { ascending: false }).limit(1)
+            historyList = data || []
+          } catch {}
+          
+          const prevEntry = historyList[0]
+          const trend_gold = prevEntry ? (fixing.goldPricePerGram24k > prevEntry.price_gold ? 'up' : (fixing.goldPricePerGram24k < prevEntry.price_gold ? 'down' : 'same')) : 'same'
+          const trend_silver = prevEntry ? (fixing.silverPricePerGram999 > prevEntry.price_silver ? 'up' : (fixing.silverPricePerGram999 < prevEntry.price_silver ? 'down' : 'same')) : 'same'
+
+          await supabase.from('price_history').insert({
+            timestamp,
+            price_gold: fixing.goldPricePerGram24k,
+            price_silver: fixing.silverPricePerGram999,
+            trend_gold,
+            trend_silver,
+          })
+
+          const { data: allHistory } = await supabase.from('price_history').select('id').order('created_at', { ascending: false })
+          if (allHistory && allHistory.length > 10) {
+            await supabase.from('price_history').delete().in('id', allHistory.slice(10).map((row) => row.id))
+          }
+
+          await supabase.from('gold_settings').update({
+            price_per_gram_24k: fixing.goldPricePerGram24k,
+            price_per_gram_silver_999: fixing.silverPricePerGram999,
+            updated_at: new Date().toISOString(),
+          }).eq('id', 1)
+        } catch (dbErr) {
+          console.error('[AUTO-SYNC] Error writing to Supabase directly:', dbErr)
+        }
 
         currentSettings.price_per_gram_24k = fixing.goldPricePerGram24k
         currentSettings.price_per_gram_silver_999 = fixing.silverPricePerGram999

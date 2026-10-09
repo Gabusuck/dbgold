@@ -36,6 +36,7 @@ async function fetchFromLbma(): Promise<LondonFixingResult> {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     },
     signal: AbortSignal.timeout(6000),
+    cache: 'no-store',
   }
 
   const [pmRes, amRes, silverRes] = await Promise.all([
@@ -107,14 +108,17 @@ async function fetchFromFallback(): Promise<LondonFixingResult> {
         fetch(`${host}/v8/finance/chart/GC=F`, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           signal: AbortSignal.timeout(6000),
+          cache: 'no-store',
         }),
         fetch(`${host}/v8/finance/chart/SI=F`, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           signal: AbortSignal.timeout(6000),
+          cache: 'no-store',
         }),
         fetch(`${host}/v8/finance/chart/EURUSD=X`, {
           headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           signal: AbortSignal.timeout(6000),
+          cache: 'no-store',
         }).catch(() => null),
       ])
 
@@ -137,6 +141,7 @@ async function fetchFromFallback(): Promise<LondonFixingResult> {
   if (!goldUsdOz || !silverUsdOz) {
     const openEr = await fetch('https://open.er-api.com/v6/latest/USD', {
       signal: AbortSignal.timeout(5000),
+      cache: 'no-store',
     }).then((r) => r.json()).catch(() => null)
     if (openEr?.rates?.EUR) eurUsdRate = 1 / openEr.rates.EUR
   }
@@ -166,25 +171,71 @@ async function fetchFromFallback(): Promise<LondonFixingResult> {
   }
 }
 
-export async function fetchLatestLondonFixing(): Promise<LondonFixingResult> {
-  // 1. Tentar obter do LBMA direto
-  try {
-    const lbmaResult = await fetchFromLbma()
-    if (lbmaResult.success && lbmaResult.goldPricePerGram24k > 0) {
-      return lbmaResult
-    }
-  } catch (lbmaErr) {
-    console.warn('[LBMA] Feed primario indisponivel ou bloqueado, a acionar contingencia:', lbmaErr instanceof Error ? lbmaErr.message : String(lbmaErr))
+/**
+ * gold-api.com: API gratuita, sem chave, devolve o preco spot diretamente em EUR por onca troy.
+ */
+async function fetchFromGoldApi(): Promise<LondonFixingResult> {
+  const opts: RequestInit = {
+    headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0 (DB Gold)' },
+    signal: AbortSignal.timeout(6000),
+    cache: 'no-store',
+  }
+  const [goldRes, silverRes] = await Promise.all([
+    fetch('https://api.gold-api.com/price/XAU/EUR', opts),
+    fetch('https://api.gold-api.com/price/XAG/EUR', opts),
+  ])
+  if (!goldRes.ok || !silverRes.ok) {
+    throw new Error(`gold-api.com HTTP: Ouro(${goldRes.status}), Prata(${silverRes.status})`)
+  }
+  const gold = await goldRes.json()
+  const silver = await silverRes.json()
+  const goldEurOz = Number(gold?.price)
+  const silverEurOz = Number(silver?.price)
+  if (!(goldEurOz > 0) || !(silverEurOz > 0)) {
+    throw new Error('gold-api.com devolveu valores invalidos.')
   }
 
-  // 2. Fallback automatico de alta disponibilidade
-  try {
-    const fallbackResult = await fetchFromFallback()
-    if (fallbackResult.success && fallbackResult.goldPricePerGram24k > 0) {
-      return fallbackResult
+  const now = new Date()
+  return {
+    success: true,
+    goldPricePerGram24k: Math.round((goldEurOz / TROY_OUNCE_IN_GRAMS) * 100) / 100,
+    silverPricePerGram999: Math.round((silverEurOz / TROY_OUNCE_IN_GRAMS) * 100) / 100,
+    date: now.toISOString().split('T')[0],
+    goldFixingType: now.getUTCHours() < 13 ? 'AM' : 'PM',
+    goldEurPerOz: Math.round(goldEurOz * 100) / 100,
+    silverEurPerOz: Math.round(silverEurOz * 100) / 100,
+    source: 'gold-api.com (Spot)',
+  }
+}
+
+/** Rejeita valores absurdos (feed partido) para nunca afixar um preco errado na loja. */
+function isSane(r: LondonFixingResult): boolean {
+  return (
+    r.success &&
+    r.goldPricePerGram24k > 20 && r.goldPricePerGram24k < 1000 &&
+    r.silverPricePerGram999 > 0.1 && r.silverPricePerGram999 < 50
+  )
+}
+
+export async function fetchLatestLondonFixing(): Promise<LondonFixingResult> {
+  // Ordem: 1) LBMA oficial  2) gold-api.com  3) Yahoo Finance + cambio
+  const sources: Array<[string, () => Promise<LondonFixingResult>]> = [
+    ['LBMA', fetchFromLbma],
+    ['GOLD-API', fetchFromGoldApi],
+    ['YAHOO', fetchFromFallback],
+  ]
+
+  for (const [name, fn] of sources) {
+    try {
+      const result = await fn()
+      if (isSane(result)) {
+        console.log(`[PRICES] Fonte usada: ${name}`, result.goldPricePerGram24k, result.silverPricePerGram999)
+        return result
+      }
+      console.warn(`[PRICES] ${name} devolveu valores fora do intervalo esperado:`, result)
+    } catch (err) {
+      console.warn(`[PRICES] ${name} indisponivel:`, err instanceof Error ? err.message : String(err))
     }
-  } catch (fallbackErr) {
-    console.error('[FALLBACK] Erro ao obter cotacoes do servico de contingencia:', fallbackErr)
   }
 
   return {

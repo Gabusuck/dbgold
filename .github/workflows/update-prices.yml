@@ -2,20 +2,10 @@ name: Atualizar Cotacoes (Fixing de Londres)
 
 on:
   schedule:
-    # 09:35 UTC (10:35 Portugal no Verao) - Logo apos Fixing AM do Ouro
-    - cron: '35 9 * * 1-5'
-    # 10:35 UTC (10:35 Portugal no Inverno)
-    - cron: '35 10 * * 1-5'
-    # 11:05 UTC (12:05 Portugal no Verao) - Logo apos Fixing da Prata
-    - cron: '5 11 * * 1-5'
-    # 12:05 UTC (12:05 Portugal no Inverno)
-    - cron: '5 12 * * 1-5'
-    # 14:05 UTC (15:05 Portugal no Verao) - Logo apos Fixing PM do Ouro
-    - cron: '5 14 * * 1-5'
-    # 15:05 UTC (15:05 Portugal no Inverno)
-    - cron: '5 15 * * 1-5'
-    # 16:00 UTC (Fecho e consolidacao)
-    - cron: '0 16 * * 1-5'
+    # De hora a hora, dias uteis, das 07:05 as 18:05 UTC (cobre Fixing AM 10:30 e PM 15:00 de Londres)
+    - cron: '5 7-18 * * 1-5'
+    # Fim de semana: 1x por dia para manter o valor fresco
+    - cron: '0 12 * * 0,6'
   workflow_dispatch:
 
 jobs:
