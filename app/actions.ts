@@ -26,6 +26,16 @@ export type PriceHistoryEntry = {
 
 const DEFAULT_HISTORY: PriceHistoryEntry[] = []
 
+/** Data/hora no fuso de Portugal (o servidor Vercel corre em UTC). Ex: "09/10 13:10" */
+function lisbonTimestamp(date = new Date()): string {
+  const tz = 'Europe/Lisbon'
+  return (
+    date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', timeZone: tz }) +
+    ' ' +
+    date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', timeZone: tz })
+  )
+}
+
 /* ─────────────────────────────────────────
    GET PRICE HISTORY (Hybrid: Supabase + Cookie Fallback)
    ───────────────────────────────────────── */
@@ -86,7 +96,7 @@ export async function getPriceHistory(): Promise<PriceHistoryEntry[]> {
 /* ─────────────────────────────────────────
    GET SETTINGS (Hybrid: Supabase + Cookie Fallback)
    ───────────────────────────────────────── */
-export async function getSettings(): Promise<GoldSettings> {
+export async function getSettings(skipAutoSync = false): Promise<GoldSettings> {
   let currentSettings = { ...DEFAULT_SETTINGS }
   // Check if Supabase is configured
   const hasSupabaseConfig = Boolean(
@@ -192,7 +202,7 @@ export async function getSettings(): Promise<GoldSettings> {
     const now = Date.now()
     const fifteenMinutes = 15 * 60 * 1000
 
-    if (now - lastUpdate > fifteenMinutes || Number.isNaN(lastUpdate)) {
+    if (!skipAutoSync && (now - lastUpdate > fifteenMinutes || Number.isNaN(lastUpdate))) {
       const fixing = await fetchLatestLondonFixing()
       if (
         fixing.success &&
@@ -205,7 +215,7 @@ export async function getSettings(): Promise<GoldSettings> {
         // Update Supabase directly instead of calling updateSettings() to avoid cookie/revalidate errors in Server Components
         try {
           const supabase = createAdminClient()
-          const timestamp = new Date().toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+          const timestamp = lisbonTimestamp()
           
           let historyList = []
           try {
@@ -299,13 +309,7 @@ export async function updateSettings(input: {
     ? (priceSilver > prevEntry.price_silver ? 'up' : (priceSilver < prevEntry.price_silver ? 'down' : 'same'))
     : 'same'
 
-  const timestamp = new Date().toLocaleDateString('pt-PT', {
-    day: '2-digit',
-    month: '2-digit',
-  }) + ' ' + new Date().toLocaleTimeString('pt-PT', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const timestamp = lisbonTimestamp()
 
   const newEntry: PriceHistoryEntry = {
     timestamp,
@@ -418,7 +422,7 @@ export async function syncLondonFixing(password?: string): Promise<{
   }
 
   // Obter definições atuais para preservar as margens/descontos configurados
-  const currentSettings = await getSettings()
+  const currentSettings = await getSettings(true)
   const discountGold = currentSettings.discount_per_gram
   const discountSilver = currentSettings.discount_per_gram_silver
 
