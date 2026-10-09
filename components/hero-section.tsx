@@ -52,8 +52,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   // Determine short-term trend for gold and silver from recent price history
   const latest = livePriceHistory.length > 0 ? livePriceHistory[0] : null
   const prev = livePriceHistory.length > 1 ? livePriceHistory[1] : null
-  const goldIsUp = latest && prev ? (latest.price_gold - prev.price_gold) > 0 : null
-  const silverIsUp = latest && prev ? (latest.price_silver - prev.price_silver) > 0 : null
+  const goldTrend: 'up' | 'down' | 'same' =
+    latest && prev
+      ? (latest.price_gold > prev.price_gold ? 'up' : latest.price_gold < prev.price_gold ? 'down' : 'same')
+      : (latest?.trend_gold ?? 'same')
+  const silverTrend: 'up' | 'down' | 'same' =
+    latest && prev
+      ? (latest.price_silver > prev.price_silver ? 'up' : latest.price_silver < prev.price_silver ? 'down' : 'same')
+      : (latest?.trend_silver ?? 'same')
 
   const selectedGold = useMemo(
     () => KARATS.find((k) => String(k.karat) === karatValue) ?? KARATS[2],
@@ -210,12 +216,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       {liveSettings.price_per_gram_24k > 0 ? formatEUR(liveSettings.price_per_gram_24k) : 'Sob Consulta'}
                     </div>
                     <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                      {goldIsUp === null ? (
-                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
-                      ) : goldIsUp ? (
-                        <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      {goldTrend === 'up' && (
+                        <span className="flex items-center gap-1 text-emerald-500 font-semibold"><TrendingUp className="h-3 w-3" /> subiu</span>
+                      )}
+                      {goldTrend === 'down' && (
+                        <span className="flex items-center gap-1 text-rose-500 font-semibold"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      )}
+                      {goldTrend === 'same' && (
+                        <span className="flex items-center gap-1 font-medium" style={{ color: textMuted }}><Minus className="h-3 w-3" /> inalterado</span>
                       )}
                     </div>
                   </div>
@@ -232,12 +240,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                         : 'Sob Consulta'}
                     </div>
                     <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                      {silverIsUp === null ? (
-                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 text-emerald-500" /> por grama</span>
-                      ) : silverIsUp ? (
-                        <span className="flex items-center gap-1 text-emerald-500"><TrendingUp className="h-3 w-3" /> subiu</span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-rose-500"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      {silverTrend === 'up' && (
+                        <span className="flex items-center gap-1 text-emerald-500 font-semibold"><TrendingUp className="h-3 w-3" /> subiu</span>
+                      )}
+                      {silverTrend === 'down' && (
+                        <span className="flex items-center gap-1 text-rose-500 font-semibold"><TrendingDown className="h-3 w-3" /> desceu</span>
+                      )}
+                      {silverTrend === 'same' && (
+                        <span className="flex items-center gap-1 font-medium" style={{ color: textMuted }}><Minus className="h-3 w-3" /> inalterado</span>
                       )}
                     </div>
                   </div>

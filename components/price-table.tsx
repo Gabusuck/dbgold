@@ -42,7 +42,8 @@ function PriceChart({
   const prev = values[values.length - 2]
   const diff = latest - prev
   const pct = prev === 0 ? 0 : (diff / prev) * 100
-  const isUp = diff >= 0
+  const isSame = Math.abs(diff) < 0.001
+  const isUp = diff > 0
 
   const W = 500, H = 160, PX = 8, PY = 12
   const cW = W - PX * 2, cH = H - PY * 2
@@ -96,11 +97,14 @@ function PriceChart({
           </div>
         </div>
         <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold ${
-          isUp ? 'bg-emerald-500/12 text-emerald-600 border border-emerald-500/25'
-               : 'bg-rose-500/12 text-rose-600 border border-rose-500/25'
+          isSame
+            ? 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20 dark:text-zinc-400'
+            : isUp
+              ? 'bg-emerald-500/12 text-emerald-600 border border-emerald-500/25'
+              : 'bg-rose-500/12 text-rose-600 border border-rose-500/25'
         }`}>
-          {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-          {isUp ? '+' : ''}{diff.toFixed(2)}€&nbsp;({pct > 0 ? '+' : ''}{pct.toFixed(1)}%)
+          {isSame ? <Minus className="h-3 w-3" /> : isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+          {isSame ? '0.00€ (0.0%)' : `${isUp ? '+' : ''}${diff.toFixed(2)}€ (${pct > 0 ? '+' : ''}${pct.toFixed(1)}%)`}
         </div>
       </div>
 
