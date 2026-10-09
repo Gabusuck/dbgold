@@ -294,14 +294,14 @@ export function PriceTable({
 
   const goldRows = KARATS.map((k) => ({
     name: k.karat === 19.2 ? `Ouro 19.2K (Português)` : `Ouro ${k.karat}K`,
-    sub: `${Math.round(k.purity * 1000)}‰`,
+    sub: `${Math.min(999, Math.round(k.purity * 1000))}‰`,
     official: formatEUR(officialPricePerGram(settings.price_per_gram_24k, k.purity)),
     pays: formatEUR(payPricePerGram(settings.price_per_gram_24k, settings.discount_per_gram, k.purity)),
   }))
 
   const silverRows = SILVER_PURITIES.map((s) => ({
     name: `Prata ${s.value}‰`,
-    sub: s.purity === 0.999 ? 'Pura' : 'Lei',
+    sub: s.value === '999' ? 'Pura' : 'Lei',
     official: formatEUR(officialPricePerGram(settings.price_per_gram_silver_999 ?? 1, s.purity)),
     pays: formatEUR(payPricePerGram(settings.price_per_gram_silver_999 ?? 1, settings.discount_per_gram_silver ?? 0.15, s.purity)),
   }))

@@ -22,7 +22,8 @@ export type SilverPurity = {
 
 // Quilates suportados na simulação, com a pureza legal em Portugal/UE.
 export const KARATS: Karat[] = [
-  { label: '24 quilates', karat: 24, purity: 0.999 },
+  // 24K = ouro fino: o preco de referencia (topo do site) ja e o preco do ouro fino, por isso fator 1
+  { label: '24 quilates', karat: 24, purity: 1 },
   { label: '22 quilates', karat: 22, purity: 0.916 },
   { label: '19.2 quilates (Português)', karat: 19.2, purity: 0.8 },
   { label: '18 quilates', karat: 18, purity: 0.75 },
@@ -32,7 +33,7 @@ export const KARATS: Karat[] = [
 
 // Purezas de prata suportadas em Portugal.
 export const SILVER_PURITIES: SilverPurity[] = [
-  { label: '999‰ (Prata Fina)', value: '999', purity: 0.999 },
+  { label: '999‰ (Prata Fina)', value: '999', purity: 1 },
   { label: '925‰ (Prata de Lei)', value: '925', purity: 0.925 },
   { label: '835‰ (Prata de Lei)', value: '835', purity: 0.835 },
   { label: '800‰ (Prata Comum)', value: '800', purity: 0.800 },

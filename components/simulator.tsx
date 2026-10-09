@@ -200,7 +200,7 @@ export function Simulator({ settings }: { settings: GoldSettings }) {
                 <SelectContent className="bg-zinc-950 border-zinc-900 text-zinc-300">
                   {KARATS.map((k) => (
                     <SelectItem key={k.karat} value={String(k.karat)} className="text-xs focus:bg-zinc-900 focus:text-white">
-                      Ouro {k.karat}K ({Math.round(k.purity * 1000)}‰)
+                      Ouro {k.karat}K ({Math.min(999, Math.round(k.purity * 1000))}‰)
                     </SelectItem>
                   ))}
                 </SelectContent>
