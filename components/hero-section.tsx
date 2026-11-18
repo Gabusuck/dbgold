@@ -61,23 +61,18 @@ export function TrendLabel({ trend, className }: { trend: Trend; className?: str
 }
 
 function StepLabel({
-  n,
   children,
   aside,
   htmlFor,
 }: {
-  n: number
   children: React.ReactNode
   aside?: React.ReactNode
   htmlFor?: string
 }) {
   const Tag = htmlFor ? 'label' : 'div'
   return (
-    <div className="mb-3 flex items-center justify-between gap-3">
-      <Tag {...(htmlFor ? { htmlFor } : {})} className="flex items-center gap-2.5 text-sm font-semibold text-foreground">
-        <span className="num flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-[11px] font-semibold text-background">
-          {n}
-        </span>
+    <div className="mb-2 flex items-center justify-between gap-3 sm:mb-3">
+      <Tag {...(htmlFor ? { htmlFor } : {})} className="text-sm font-semibold text-foreground">
         {children}
       </Tag>
       {aside}
@@ -289,11 +284,11 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 </div>
 
                 {/* ① Metal toggle with sliding indicator */}
-                <div className="mt-5 sm:mt-8">
-                <StepLabel n={1}>Metal</StepLabel>
-                <div className="relative grid grid-cols-2 rounded-2xl bg-muted p-1.5" role="tablist" aria-label="Metal">
+                <div className="mt-4 sm:mt-8">
+                <StepLabel>Metal</StepLabel>
+                <div className="relative grid grid-cols-2 rounded-xl bg-muted p-1 sm:rounded-2xl sm:p-1.5" role="tablist" aria-label="Metal">
                   <span
-                    className="absolute inset-y-1.5 left-1.5 w-[calc(50%-0.375rem)] rounded-xl bg-card shadow-[0_4px_14px_-4px_rgba(0,0,0,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-card sm:inset-y-1.5 sm:left-1.5 sm:w-[calc(50%-0.375rem)] sm:rounded-xl shadow-[0_4px_14px_-4px_rgba(0,0,0,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                     style={{ transform: isGold ? 'translateX(0)' : 'translateX(100%)' }}
                     aria-hidden
                   />
@@ -304,7 +299,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       aria-selected={metalType === m}
                       onClick={() => setMetalType(m)}
                       className={cn(
-                        'relative z-10 flex h-9 items-center justify-center gap-2 text-sm font-semibold transition-colors duration-300 sm:h-11',
+                        'relative z-10 flex h-8 items-center justify-center gap-2 text-sm font-semibold transition-colors duration-300 sm:h-11',
                         metalType === m ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
@@ -323,9 +318,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 </div>
 
                 {/* ② Quality */}
-                <div className="mt-5 border-t border-border pt-5 sm:mt-7 sm:border-0 sm:pt-0">
+                <div className="mt-4 border-t border-border pt-4 sm:mt-7 sm:border-0 sm:pt-0">
                   <StepLabel
-                    n={2}
                     aside={
                       <span key={isGold ? karatValue : silverValue} className="pop text-xs text-muted-foreground">
                         {isGold ? selectedGold.label : selectedSilver.label}
@@ -334,7 +328,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                   >
                     Qualidade
                   </StepLabel>
-                  <div key={metalType} className={cn('pop grid gap-2', isGold ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-4')}>
+                  <div key={metalType} className={cn('pop grid gap-1.5 sm:gap-2', isGold ? 'grid-cols-6' : 'grid-cols-4')}>
                     {isGold
                       ? KARATS.map((k) => {
                           const active = karatValue === String(k.karat)
@@ -347,14 +341,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                               aria-label={isPT ? 'Ouro português 19.2 quilates' : `${k.karat} quilates`}
                               className={cn(
                                 chip(active),
-                                'flex h-14 flex-col items-center justify-center gap-0.5 px-0 text-sm',
+                                'flex h-11 flex-col items-center justify-center gap-0.5 px-0 text-[13px] sm:h-14 sm:text-sm',
                                 isPT && !active && 'ring-1 ring-inset ring-amber-500/50 bg-amber-500/10 text-foreground'
                               )}
                             >
                               <span>{k.karat}K</span>
                               <span
                                 className={cn(
-                                  'text-[10px] font-medium leading-none',
+                                  'text-[8px] font-medium leading-none tracking-tight sm:text-[10px] sm:tracking-normal',
                                   isPT
                                     ? active ? 'text-amber-300' : 'text-amber-700 dark:text-amber-400'
                                     : active ? 'text-background/60' : 'text-muted-foreground/70'
@@ -379,8 +373,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 </div>
 
                 {/* ③ Weight */}
-                <div className="mt-5 border-t border-border pt-5 sm:mt-7 sm:border-0 sm:pt-0">
-                  <StepLabel n={3} htmlFor="sim-weight">Peso</StepLabel>
+                <div className="mt-4 border-t border-border pt-4 sm:mt-7 sm:border-0 sm:pt-0">
+                  <StepLabel htmlFor="sim-weight">Peso</StepLabel>
                   <div className="relative">
                     <input
                       id="sim-weight"
@@ -391,7 +385,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       step="0.1"
                       value={grams}
                       onChange={(e) => setGrams(e.target.value)}
-                      className="no-spinner num h-12 w-full rounded-xl border border-border bg-background pl-4 pr-16 text-lg font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-amber-500 focus:ring-4 focus:ring-amber-500/15"
+                      className="no-spinner num h-11 w-full rounded-xl border border-border bg-background pl-4 pr-16 text-base sm:h-12 sm:text-lg font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-amber-500 focus:ring-4 focus:ring-amber-500/15"
                     />
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 select-none text-sm text-muted-foreground">gramas</span>
                   </div>
@@ -419,14 +413,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     />
                   </div>
 
-                  <div className="mt-2.5 grid grid-cols-6 gap-1.5 sm:mt-2 sm:flex sm:flex-wrap sm:gap-2">
+                  <div className="mt-2 grid grid-cols-6 gap-1.5 sm:mt-2 sm:flex sm:flex-wrap sm:gap-2">
                     {WEIGHT_PRESETS.map((w) => (
                       <button
                         key={w}
                         onClick={() => setGrams(String(w))}
                         aria-pressed={gramsNum === w}
                         className={cn(
-                          'num h-9 rounded-full border px-0 text-xs font-semibold transition-all duration-200 sm:h-8 sm:px-3.5',
+                          'num h-8 rounded-full border px-0 text-xs font-semibold transition-all duration-200 sm:px-3.5',
                           gramsNum === w
                             ? 'border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400'
                             : 'border-border text-muted-foreground hover:border-foreground/25 hover:text-foreground'
