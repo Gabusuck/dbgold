@@ -137,10 +137,10 @@ export function AdminDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="light sm:max-w-md max-h-[90vh] overflow-y-auto bg-white text-stone-900">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-primary" />
+            <Lock className="h-4 w-4 text-gold" />
             Área reservada
           </DialogTitle>
           <DialogDescription>
@@ -176,13 +176,13 @@ export function AdminDialog({
         ) : (
           <div className="flex flex-col gap-4">
             {/* Sincronização direta com Fixing de Londres */}
-            <div className="bg-amber-50/80 border border-amber-500/25 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-gold-soft border border-border rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   Fixing de Londres (LBMA)
                 </span>
-                <span className="text-[11px] text-stone-600 mt-0.5">
+                <span className="text-[11px] text-muted-foreground mt-0.5">
                   Atualiza as cotações de Ouro 24K e Prata 999 em tempo real.
                 </span>
               </div>
@@ -191,7 +191,7 @@ export function AdminDialog({
                 onClick={handleSyncFixing}
                 disabled={syncing || pending}
                 variant="outline"
-                className="h-8 px-3 text-xs font-bold gap-1.5 border-amber-600/30 text-amber-950 bg-white hover:bg-amber-100/60 shrink-0"
+                className="h-8 px-3 text-xs font-medium gap-1.5 shrink-0"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} />
                 {syncing ? 'A atualizar...' : 'Sincronizar'}
@@ -199,8 +199,8 @@ export function AdminDialog({
             </div>
 
             {/* Ouro Settings */}
-            <div className="border-b border-border/60 pb-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-500 mb-3">Definições de Ouro</h4>
+            <div className="border-b border-border pb-5">
+              <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3"><span className="h-2 w-2 rounded-full bg-gold" />Definições de Ouro</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="price" className="text-xs">Preço Ouro 24k (€/g)</Label>
@@ -217,14 +217,14 @@ export function AdminDialog({
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="discount" className="text-xs">Desconto Ouro</Label>
-                    <div className="flex rounded-md bg-stone-100 border border-stone-200 p-0.5 text-[9px] font-black">
+                    <div className="flex rounded-md bg-muted border border-border p-0.5 text-[10px] font-semibold">
                       <button
                         type="button"
                         onClick={() => setGoldDiscountType('fixed')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           goldDiscountType === 'fixed'
-                            ? 'bg-amber-500 text-amber-950'
-                            : 'text-stone-400 hover:text-stone-700'
+                            ? 'bg-card text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         €/g
@@ -234,8 +234,8 @@ export function AdminDialog({
                         onClick={() => setGoldDiscountType('percent')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           goldDiscountType === 'percent'
-                            ? 'bg-amber-500 text-amber-950'
-                            : 'text-stone-400 hover:text-stone-700'
+                            ? 'bg-card text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         %
@@ -253,7 +253,7 @@ export function AdminDialog({
                       onChange={(e) => setDiscount(e.target.value)}
                       className="pr-8"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500 pointer-events-none select-none">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground pointer-events-none select-none">
                       {goldDiscountType === 'fixed' ? '€/g' : '%'}
                     </span>
                   </div>
@@ -262,8 +262,8 @@ export function AdminDialog({
             </div>
 
             {/* Prata Settings */}
-            <div className="border-b border-border/60 pb-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Definições de Prata</h4>
+            <div className="border-b border-border pb-5">
+              <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3"><span className="h-2 w-2 rounded-full bg-silver" />Definições de Prata</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="price-silver" className="text-xs">Preço Prata 999 (€/g)</Label>
@@ -280,14 +280,14 @@ export function AdminDialog({
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="discount-silver" className="text-xs">Desconto Prata</Label>
-                    <div className="flex rounded-md bg-stone-100 border border-stone-200 p-0.5 text-[9px] font-black">
+                    <div className="flex rounded-md bg-muted border border-border p-0.5 text-[10px] font-semibold">
                       <button
                         type="button"
                         onClick={() => setSilverDiscountType('fixed')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           silverDiscountType === 'fixed'
-                            ? 'bg-amber-500 text-amber-950'
-                            : 'text-stone-400 hover:text-stone-700'
+                            ? 'bg-card text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         €/g
@@ -297,8 +297,8 @@ export function AdminDialog({
                         onClick={() => setSilverDiscountType('percent')}
                         className={`rounded px-1.5 py-0.5 transition-colors ${
                           silverDiscountType === 'percent'
-                            ? 'bg-amber-500 text-amber-950'
-                            : 'text-stone-400 hover:text-stone-700'
+                            ? 'bg-card text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         %
@@ -316,7 +316,7 @@ export function AdminDialog({
                       onChange={(e) => setDiscountSilver(e.target.value)}
                       className="pr-8"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500 pointer-events-none select-none">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground pointer-events-none select-none">
                       {silverDiscountType === 'fixed' ? '€/g' : '%'}
                     </span>
                   </div>
@@ -324,7 +324,7 @@ export function AdminDialog({
               </div>
             </div>
 
-            <Button onClick={handleSave} disabled={pending} className="h-11 rounded-lg">
+            <Button onClick={handleSave} disabled={pending} className="h-11 rounded-md">
               <Save className="h-4 w-4" />
               Guardar alterações
             </Button>

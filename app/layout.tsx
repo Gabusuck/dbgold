@@ -1,13 +1,14 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Inter } from 'next/font/google'
+import { Instrument_Serif, Inter } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
-import Script from 'next/script'
 import './globals.css'
 
-const playfair = Playfair_Display({
+const serif = Instrument_Serif({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-serif-display',
   display: 'swap',
 })
 
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#f4f1ec',
+  themeColor: '#fafaf7',
 }
 
 export default function RootLayout({
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt" className={`light ${playfair.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="pt" className={`${serif.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         {/* Ptengine Tag */}
         <script src="https://js.ptengine.com/4378uf5z.js" defer />

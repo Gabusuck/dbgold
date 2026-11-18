@@ -20,11 +20,11 @@ export function SiteHeader() {
 
   useEffect(() => {
     setMounted(true)
-    
+
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual'
     }
-    
+
     // Safari ignores scrollTo if run too early, delay it slightly to guarantee it fires
     const scrollTimer = setTimeout(() => {
       window.scrollTo(0, 0)

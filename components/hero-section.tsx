@@ -1,7 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import {
   KARATS,
   SILVER_PURITIES,
@@ -10,11 +9,21 @@ import {
   payPricePerGram,
   type GoldSettings,
 } from '@/lib/gold'
-import { Trash2, TrendingUp, TrendingDown, Minus, Scale, ChevronDown, ChevronUp, Clock } from 'lucide-react'
+import {
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ChevronDown,
+  Clock,
+  ArrowDown,
+  Check,
+} from 'lucide-react'
 import type { PriceHistoryEntry } from '@/app/actions'
 import { toast } from 'sonner'
-import { ScrollReveal } from './scroll-reveal'
+import { cn } from '@/lib/utils'
 import { useLivePrices } from './live-prices'
+import { AnimatedNumber } from './animated-number'
 
 type HistoryItem = {
   id: string
@@ -26,7 +35,30 @@ type HistoryItem = {
   timestamp: string
 }
 
+type Trend = 'up' | 'down' | 'same'
+
 const WEIGHT_PRESETS = [1, 5, 10, 20, 50, 100]
+const SLIDER_MAX = 200
+
+export function TrendLabel({ trend, className }: { trend: Trend; className?: string }) {
+  if (trend === 'up')
+    return (
+      <span className={cn('inline-flex items-center gap-1 text-xs font-medium text-up', className)}>
+        <TrendingUp className="h-3.5 w-3.5" /> subiu
+      </span>
+    )
+  if (trend === 'down')
+    return (
+      <span className={cn('inline-flex items-center gap-1 text-xs font-medium text-down', className)}>
+        <TrendingDown className="h-3.5 w-3.5" /> desceu
+      </span>
+    )
+  return (
+    <span className={cn('inline-flex items-center gap-1 text-xs font-medium text-muted-foreground', className)}>
+      <Minus className="h-3.5 w-3.5" /> inalterado
+    </span>
+  )
+}
 
 export function HeroSection({ settings, priceHistory }: { settings: GoldSettings; priceHistory?: PriceHistoryEntry[] }) {
   const [metalType, setMetalType] = useState<'ouro' | 'prata'>('ouro')
@@ -35,7 +67,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   const [grams, setGrams] = useState('10')
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [showHistory, setShowHistory] = useState(false)
-  const { resolvedTheme } = useTheme()
+  const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     try {
@@ -44,19 +76,17 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
     } catch { /* ignore */ }
   }, [])
 
-  const light = resolvedTheme !== 'dark'
-
   // Live settings: shared with the price table so every section shows the same value
   const { settings: liveSettings, history: livePriceHistory } = useLivePrices(settings, priceHistory)
 
   // Determine short-term trend for gold and silver from recent price history
   const latest = livePriceHistory.length > 0 ? livePriceHistory[0] : null
   const prev = livePriceHistory.length > 1 ? livePriceHistory[1] : null
-  const goldTrend: 'up' | 'down' | 'same' =
+  const goldTrend: Trend =
     latest && prev
       ? (latest.price_gold > prev.price_gold ? 'up' : latest.price_gold < prev.price_gold ? 'down' : 'same')
       : (latest?.trend_gold ?? 'same')
-  const silverTrend: 'up' | 'down' | 'same' =
+  const silverTrend: Trend =
     latest && prev
       ? (latest.price_silver > prev.price_silver ? 'up' : latest.price_silver < prev.price_silver ? 'down' : 'same')
       : (latest?.trend_silver ?? 'same')
@@ -128,363 +158,409 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   }
 
   const isGold = metalType === 'ouro'
-  const accent = isGold ? '#f59e0b' : '#64748b'
+  const goldPrice = liveSettings.price_per_gram_24k
+  const silverPrice = liveSettings.price_per_gram_silver_999
 
-  // ── Light-mode palette tokens ──
-  const bg = 'transparent'
-  const cardBg = light ? 'rgba(255,255,255,0.95)' : 'rgba(22, 20, 18, 0.90)'
-  const cardBorder = light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
-  const panelBg = light ? 'rgba(255,255,255,0.92)' : 'rgba(20, 18, 16, 0.96)'
-  const panelBorder = light ? 'rgba(180,83,9,0.2)' : 'rgba(245,158,11,0.22)'
-  const inputBg = light ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'
-  const inputBorder = light ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.10)'
-  const toggleBg = light ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)'
-  const pillBg = light ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.06)'
-  const historyBg = light ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.03)'
-  const historyBorder = light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'
-  const dividerColor = light ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)'
-  const rowHover = light ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)'
-  const breakdownBg = light ? `linear-gradient(135deg,${accent}10 0%,rgba(0,0,0,0.03) 100%)` : `linear-gradient(135deg,${accent}08 0%,rgba(0,0,0,0.2) 100%)`
-  const breakdownRowBg = light ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.15)'
+  const onCardMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`)
+    el.style.setProperty('--my', `${e.clientY - r.top}px`)
+  }
 
-  const textPrimary = light ? '#1a1208' : '#ffffff'
-  const textSecondary = light ? '#6a5438' : '#a1a1aa'
-  const textMuted = light ? '#9a8268' : '#52525b'
-  const textFaint = light ? '#b0987c' : '#3f3f46'
-  const badgeInactive = light ? 'text-stone-600 hover:text-stone-900' : 'text-zinc-600 hover:text-zinc-300'
+  const sliderPct = Math.min(100, (gramsNum / SLIDER_MAX) * 100)
+
+  const chip = (active: boolean) =>
+    cn(
+      'num relative h-11 rounded-xl text-sm font-semibold transition-all duration-300',
+      active
+        ? 'bg-foreground text-background shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45)] scale-[1.03]'
+        : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+    )
 
   return (
-    <section
-      id="simulador"
-      className="relative min-h-[100dvh] flex flex-col scroll-mt-0 overflow-hidden"
-      style={{ background: bg }}
-    >
-      {/* Background decoration */}
-      {!light && (
-        <>
-          <div className="anim-float-slow absolute top-[40%] left-[5%] h-80 w-80 rounded-full opacity-[0.06] blur-[100px] pointer-events-none"
-            style={{ background: 'radial-gradient(circle, #fbbf24 0%, transparent 70%)' }} />
-          <div className="anim-float-med absolute bottom-24 right-[8%] h-60 w-60 rounded-full opacity-[0.05] blur-[80px] pointer-events-none"
-            style={{ background: 'radial-gradient(circle, #d97706 0%, transparent 70%)' }} />
-        </>
-      )}
+    <>
+      {/* ═══════════════ HERO ═══════════════ */}
+      <section className="relative overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28">
+        {/* Animated aurora */}
+        <div className="pointer-events-none absolute inset-0 -z-0" aria-hidden>
+          <div className="aurora aurora-1 left-[8%] top-[6%] h-[380px] w-[380px] bg-amber-300/40 dark:bg-amber-500/15" />
+          <div className="aurora aurora-2 right-[6%] top-[14%] h-[420px] w-[420px] bg-yellow-200/50 dark:bg-yellow-500/10" />
+          <div className="aurora aurora-3 left-[38%] top-[38%] h-[300px] w-[300px] bg-orange-200/40 dark:bg-orange-500/10" />
+          <div className="bg-dots absolute inset-0" />
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="mx-auto max-w-7xl w-full px-5 md:px-8 py-6 md:py-0">
-          <div className="grid gap-12 lg:grid-cols-2 items-center">
+        <div className="container-page relative flex flex-col items-center text-center">
+          {/* Live price pill */}
+          <a
+            href="#precos"
+            className="anim-fade-up group inline-flex items-center gap-3 rounded-full border border-border bg-card/70 py-1.5 pl-2 pr-4 text-sm shadow-sm backdrop-blur-md transition-all hover:border-amber-500/40 hover:shadow-md"
+          >
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-0.5 text-xs font-semibold text-background">
+              <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Live
+            </span>
+            <span className="num font-medium text-foreground">
+              Ouro 24K {goldPrice > 0 ? <>{formatEUR(goldPrice)}<span className="text-muted-foreground">/g</span></> : 'Sob Consulta'}
+            </span>
+          </a>
 
-            {/* ── Left: Hero copy ── */}
-            <ScrollReveal variant="slide-right">
-              <div className="flex flex-col gap-6 md:gap-8">
-                <div>
-                  <span className="inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-600 glass-gold">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
-                    </span>
-                    Cotações Actualizadas
-                  </span>
-                </div>
+          <h1 className="anim-fade-up anim-delay-1 mt-8 max-w-5xl text-balance text-[2.9rem] font-semibold leading-[0.98] tracking-[-0.05em] text-foreground sm:text-7xl md:text-[5.5rem]">
+            Compramos ouro &amp; prata
+            <br />
+            <span className="text-gold-gradient">ao melhor preço.</span>
+          </h1>
 
-                <div>
-                  <h1
-                    className="font-bold leading-[1.08] tracking-tight text-4xl md:text-6xl lg:text-[5rem]"
-                    style={{ color: textPrimary }}
-                  >
-                    Compramos<br />
-                    <span className="text-shimmer">Ouro &amp; Prata</span><br />
-                    <span className="font-light text-3xl md:text-5xl lg:text-6xl italic" style={{ color: textSecondary }}>ao melhor preço.</span>
-                  </h1>
-                </div>
+          <p className="anim-fade-up anim-delay-2 mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            Transformamos os seus metais preciosos em capital imediato, com avaliação técnica profissional e cotações oficiais diárias.
+          </p>
 
-                <p className="text-[15px] max-w-md leading-[1.75]" style={{ color: textSecondary }}>
-                  Avaliação técnica profissional com cotações oficiais diárias e pagamento imediato em mão.
-                </p>
+          <div className="anim-fade-up anim-delay-3 mt-10 flex flex-col items-center gap-3 sm:flex-row">
+            <a
+              href="#simulador"
+              className="group inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)]"
+            >
+              Simular valor agora
+              <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+            </a>
+            <a
+              href="#precos"
+              className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+            >
+              Ver cotações
+            </a>
+          </div>
 
-                {/* Live price cards */}
-                <div className="grid grid-cols-2 gap-3 max-w-sm">
-                  <div
-                    className="glass rounded-2xl p-3 md:p-4 anim-glow-pulse"
-                    style={{
-                      borderColor: light ? 'rgba(180,83,9,0.2)' : 'rgba(251,191,36,0.18)',
-                      animation: 'heroFadeSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both',
-                    }}
-                  >
-                    <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600/80 mb-2">Ouro 24K</div>
-                    <div className="text-xl xs:text-2xl font-bold text-amber-500 font-mono">
-                      {liveSettings.price_per_gram_24k > 0 ? formatEUR(liveSettings.price_per_gram_24k) : 'Sob Consulta'}
-                    </div>
-                    <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                      {goldTrend === 'up' && (
-                        <span className="flex items-center gap-1 text-emerald-500 font-semibold"><TrendingUp className="h-3 w-3" /> subiu</span>
-                      )}
-                      {goldTrend === 'down' && (
-                        <span className="flex items-center gap-1 text-rose-500 font-semibold"><TrendingDown className="h-3 w-3" /> desceu</span>
-                      )}
-                      {goldTrend === 'same' && (
-                        <span className="flex items-center gap-1 font-medium" style={{ color: textMuted }}><Minus className="h-3 w-3" /> inalterado</span>
-                      )}
-                    </div>
-                  </div>
-                  <div
-                    className="glass rounded-2xl p-3 md:p-4 anim-silver-glow-pulse"
-                    style={{
-                      animation: 'heroFadeSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both',
-                    }}
-                  >
-                    <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-2" style={{ color: textMuted }}>Prata 999</div>
-                    <div className="text-xl xs:text-2xl font-bold font-mono" style={{ color: light ? '#475569' : '#e2e8f0' }}>
-                      {liveSettings.price_per_gram_silver_999 && liveSettings.price_per_gram_silver_999 > 0
-                        ? formatEUR(liveSettings.price_per_gram_silver_999)
-                        : 'Sob Consulta'}
-                    </div>
-                    <div className="text-[10px] mt-1 flex items-center gap-1" style={{ color: textMuted }}>
-                      {silverTrend === 'up' && (
-                        <span className="flex items-center gap-1 text-emerald-500 font-semibold"><TrendingUp className="h-3 w-3" /> subiu</span>
-                      )}
-                      {silverTrend === 'down' && (
-                        <span className="flex items-center gap-1 text-rose-500 font-semibold"><TrendingDown className="h-3 w-3" /> desceu</span>
-                      )}
-                      {silverTrend === 'same' && (
-                        <span className="flex items-center gap-1 font-medium" style={{ color: textMuted }}><Minus className="h-3 w-3" /> inalterado</span>
-                      )}
-                    </div>
+          <ul className="anim-fade-up anim-delay-4 mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm text-muted-foreground">
+            {['Sem comissões ocultas', 'Avaliação presencial', 'Fecho no próprio dia'].map((t) => (
+              <li key={t} className="flex items-center gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                  <Check className="h-3 w-3" strokeWidth={3} />
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ═══════════════ SIMULATOR ═══════════════ */}
+      <section id="simulador" className="relative scroll-mt-24 pb-24 md:pb-32">
+        <div className="container-page">
+          <div
+            ref={cardRef}
+            onMouseMove={onCardMove}
+            className="group/card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)] dark:shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]"
+          >
+            <div className="spotlight pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100" />
+
+            <div className="relative grid lg:grid-cols-[1.15fr_1fr]">
+              {/* ── Controls ── */}
+              <div className="flex flex-col gap-8 p-6 sm:p-8 md:p-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">Simulador de venda</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Estimativa instantânea com a cotação de hoje.</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs py-0.5" style={{ color: textSecondary }}>
-                  <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                  <span>Atualização diária nos horários do Fixing de Londres: <strong>10h35</strong> e <strong>15h05</strong> (Ouro) | <strong>12h05</strong> (Prata)</span>
-                </div>
-
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs border-t pt-5" style={{ borderColor: dividerColor, color: textFaint }}>
-                  {['✓ Sem comissões ocultas', '✓ Avaliação presencial', '✓ Fecho no próprio dia'].map((t) => (
-                    <span key={t}>{t}</span>
+                {/* ① Metal toggle with sliding indicator */}
+                <div className="relative grid grid-cols-2 rounded-2xl bg-muted p-1.5" role="tablist" aria-label="Metal">
+                  <span
+                    className="absolute inset-y-1.5 left-1.5 w-[calc(50%-0.375rem)] rounded-xl bg-card shadow-[0_4px_14px_-4px_rgba(0,0,0,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    style={{ transform: isGold ? 'translateX(0)' : 'translateX(100%)' }}
+                    aria-hidden
+                  />
+                  {(['ouro', 'prata'] as const).map((m) => (
+                    <button
+                      key={m}
+                      role="tab"
+                      aria-selected={metalType === m}
+                      onClick={() => setMetalType(m)}
+                      className={cn(
+                        'relative z-10 flex h-11 items-center justify-center gap-2 text-sm font-semibold transition-colors duration-300',
+                        metalType === m ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'h-3 w-3 rounded-full',
+                          m === 'ouro'
+                            ? 'bg-gradient-to-br from-yellow-300 to-amber-600'
+                            : 'bg-gradient-to-br from-slate-200 to-slate-500'
+                        )}
+                      />
+                      {m === 'ouro' ? 'Ouro' : 'Prata'}
+                    </button>
                   ))}
                 </div>
-              </div>
-            </ScrollReveal>
 
-            {/* ── Right: Simulator ── */}
-            <div className="w-full">
-                <div
-                  className="rounded-3xl p-[1px]"
-                  style={{
-                    background: `linear-gradient(135deg, ${accent}55, ${light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)'}, ${accent}25)`,
-                    boxShadow: `0 0 80px ${accent}15, 0 32px 64px ${light ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.5)'}`,
-                  }}
-                >
-                  <div className="rounded-[23px] p-4 md:p-7" style={{ background: panelBg, border: `1px solid ${panelBorder}` }}>
-
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl glass-gold">
-                        <Scale className="h-4 w-4 text-amber-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold" style={{ color: textPrimary }}>Simulador de Venda</div>
-                        <div className="text-[10px]" style={{ color: textMuted }}>estimativa instantânea</div>
-                      </div>
-                    </div>
-                    <span className="text-[9px] text-amber-600/70 font-bold uppercase tracking-widest border border-amber-500/20 rounded-lg px-2.5 py-1">Live</span>
+                {/* ② Quality */}
+                <div>
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <span className="text-sm font-medium text-foreground">Qualidade</span>
+                    <span key={isGold ? karatValue : silverValue} className="pop text-xs text-muted-foreground">
+                      {isGold ? selectedGold.label : selectedSilver.label}
+                    </span>
                   </div>
-
-                  {/* ① Metal toggle */}
-                  <div className="mb-5 rounded-xl p-1" style={{ background: toggleBg }}>
-                    <div className="grid grid-cols-2 gap-1">
-                      {(['ouro', 'prata'] as const).map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => setMetalType(m)}
-                          className={`py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 ${
-                            metalType === m
-                              ? m === 'ouro'
-                                ? 'bg-amber-500 text-amber-950 shadow-[0_4px_20px_rgba(245,158,11,0.35)]'
-                                : light
-                                  ? 'bg-slate-500 text-white shadow-lg'
-                                  : 'bg-zinc-200 text-zinc-900 shadow-lg'
-                              : badgeInactive
-                          }`}
-                        >
-                          {m === 'ouro' ? '✦ Ouro' : '◈ Prata'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ② Quality */}
-                  <div className="mb-5">
-                    <div className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: textMuted }}>Qualidade</div>
-                    <div className="flex flex-wrap gap-2">
-                      {isGold
-                        ? KARATS.map((k) => (
+                  <div key={metalType} className={cn('pop grid gap-2', isGold ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-4')}>
+                    {isGold
+                      ? KARATS.map((k) => {
+                          const active = karatValue === String(k.karat)
+                          const isPT = k.karat === 19.2
+                          return (
                             <button
                               key={k.karat}
                               onClick={() => setKaratValue(String(k.karat))}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
-                                karatValue === String(k.karat)
-                                  ? 'bg-amber-500 text-amber-950'
-                                  : badgeInactive
-                              }`}
-                              style={karatValue !== String(k.karat) ? { background: pillBg } : {}}
+                              aria-pressed={active}
+                              aria-label={isPT ? 'Ouro português 19.2 quilates' : `${k.karat} quilates`}
+                              className={cn(
+                                chip(active),
+                                'flex h-14 flex-col items-center justify-center gap-0.5',
+                                isPT && !active && 'ring-1 ring-inset ring-amber-500/50 bg-amber-500/10 text-foreground'
+                              )}
                             >
-                              {k.karat}K
+                              <span>{k.karat}K</span>
+                              <span
+                                className={cn(
+                                  'text-[10px] font-medium leading-none',
+                                  isPT
+                                    ? active ? 'text-amber-300' : 'text-amber-700 dark:text-amber-400'
+                                    : active ? 'text-background/60' : 'text-muted-foreground/70'
+                                )}
+                              >
+                                {isPT ? 'Português' : `${Math.min(999, Math.round(k.purity * 1000))}‰`}
+                              </span>
                             </button>
-                          ))
-                        : SILVER_PURITIES.map((s) => (
-                            <button
-                              key={s.value}
-                              onClick={() => setSilverValue(s.value)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
-                                silverValue === s.value
-                                  ? light ? 'bg-slate-500 text-white' : 'bg-zinc-200 text-zinc-900'
-                                  : badgeInactive
-                              }`}
-                              style={silverValue !== s.value ? { background: pillBg } : {}}
-                            >
-                              {s.value}‰
-                            </button>
-                          ))
-                      }
+                          )
+                        })
+                      : SILVER_PURITIES.map((s) => (
+                          <button
+                            key={s.value}
+                            onClick={() => setSilverValue(s.value)}
+                            aria-pressed={silverValue === s.value}
+                            className={chip(silverValue === s.value)}
+                          >
+                            {s.value}‰
+                          </button>
+                        ))}
+                  </div>
+                </div>
+
+                {/* ③ Weight */}
+                <div>
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <label htmlFor="sim-weight" className="text-sm font-medium text-foreground">Peso</label>
+                    <div className="relative">
+                      <input
+                        id="sim-weight"
+                        type="number"
+                        inputMode="decimal"
+                        min="0.1"
+                        max="9999"
+                        step="0.1"
+                        value={grams}
+                        onChange={(e) => setGrams(e.target.value)}
+                        className="no-spinner num h-10 w-28 rounded-xl border border-border bg-background pl-3 pr-8 text-right text-base font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-amber-500 focus:ring-4 focus:ring-amber-500/15"
+                      />
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-sm text-muted-foreground">g</span>
                     </div>
                   </div>
 
-                  {/* ③ Weight */}
-                  <div className="mb-5">
-                    <div className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: textMuted }}>Peso</div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="relative">
-                        <input
-                          type="number"
-                          inputMode="decimal"
-                          min="0.1"
-                          max="9999"
-                          step="0.1"
-                          value={grams}
-                          onChange={(e) => setGrams(e.target.value)}
-                          className="w-24 h-10 text-center font-mono font-bold text-sm rounded-xl outline-none focus:ring-1 focus:ring-amber-500/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: textPrimary }}
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none select-none" style={{ color: textMuted }}>g</span>
-                      </div>
-                      {WEIGHT_PRESETS.map((w) => (
-                        <button
-                          key={w}
-                          onClick={() => setGrams(String(w))}
-                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 ${
-                            gramsNum === w
-                              ? isGold
-                                ? 'bg-amber-500/20 text-amber-600 border border-amber-500/40'
-                                : light
-                                  ? 'bg-slate-400/20 text-slate-600 border border-slate-400/40'
-                                  : 'bg-zinc-600/40 text-zinc-300 border border-zinc-600/60'
-                              : ''
-                          }`}
-                          style={gramsNum !== w ? { background: pillBg, border: `1px solid ${dividerColor}`, color: textMuted } : {}}
-                        >
-                          {w}g
-                        </button>
-                      ))}
-                    </div>
+                  {/* Range slider */}
+                  <div className="relative py-3">
+                    <div className="h-1.5 w-full rounded-full bg-muted" />
+                    <div
+                      className="absolute left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-[width] duration-150"
+                      style={{ width: `${sliderPct}%` }}
+                    />
+                    <div
+                      className="pointer-events-none absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-500 bg-card shadow-md transition-[left] duration-150"
+                      style={{ left: `${sliderPct}%` }}
+                    />
+                    <input
+                      type="range"
+                      min={0}
+                      max={SLIDER_MAX}
+                      step={0.5}
+                      value={Math.min(gramsNum, SLIDER_MAX)}
+                      onChange={(e) => setGrams(e.target.value)}
+                      aria-label="Peso em gramas"
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    />
                   </div>
 
-                  {/* ④ Result breakdown */}
-                  <div
-                    className="mb-5 rounded-2xl overflow-hidden"
-                    style={{ border: `1px solid ${accent}20` }}
-                  >
-                    <div className="p-4 md:p-6 text-center" style={{ background: breakdownBg }}>
-                      <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: textMuted }}>Recebe Aproximadamente</div>
-                      <div className="text-4xl md:text-5xl font-bold font-mono tracking-tight" style={{ color: isGold ? '#d97706' : (light ? '#475569' : '#e2e8f0') }}>
-                        {formatEUR(activeParams.total)}
-                      </div>
-                    </div>
-                    <div className="divide-y" style={{ borderColor: `${accent}10`, background: breakdownRowBg }}>
-                      <div className="flex justify-between items-center px-4 py-2.5 text-xs">
-                        <span style={{ color: textSecondary }}>Cotação oficial</span>
-                        <span className="font-mono" style={{ color: textMuted }}>{formatEUR(activeParams.officialPerGram)}/g → {formatEUR(activeParams.officialTotal)}</span>
-                      </div>
-                      <div className="flex justify-between items-center px-4 py-2.5 text-xs">
-                        <span style={{ color: textSecondary }}>Pagamos</span>
-                        <span className="font-mono font-bold" style={{ color: accent }}>{formatEUR(activeParams.payPerGram)}/g × {gramsNum}g</span>
-                      </div>
-                    </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {WEIGHT_PRESETS.map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => setGrams(String(w))}
+                        aria-pressed={gramsNum === w}
+                        className={cn(
+                          'num h-8 rounded-full border px-3.5 text-xs font-semibold transition-all duration-200',
+                          gramsNum === w
+                            ? 'border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                            : 'border-border text-muted-foreground hover:border-foreground/25 hover:text-foreground'
+                        )}
+                      >
+                        {w}g
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Result panel ── */}
+              <div className="shine relative m-2 flex flex-col justify-between gap-8 overflow-hidden rounded-[1.6rem] bg-zinc-950 p-6 text-white sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
+                <div
+                  className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-[80px] transition-colors duration-700"
+                  style={{ background: isGold ? 'rgba(245,158,11,0.35)' : 'rgba(148,163,184,0.3)' }}
+                  aria-hidden
+                />
+
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/60">Recebe aproximadamente</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/80">
+                      <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Live
+                    </span>
                   </div>
 
-                  {/* ⑤ Actions */}
+                  <div aria-live="polite" className="mt-3">
+                    <AnimatedNumber
+                      value={activeParams.total}
+                      format={formatEUR}
+                      className={cn(
+                        'num block text-5xl font-semibold tracking-[-0.045em] sm:text-6xl',
+                        isGold ? 'text-gold-gradient' : 'text-slate-100'
+                      )}
+                    />
+                  </div>
+                  <div className="mt-2 text-sm text-white/50">
+                    {activeParams.purityLabel}
+                    {isGold && selectedGold.karat === 19.2 && <span className="text-amber-300/90"> (Português)</span>}
+                    {' '}· <span className="num">{gramsNum}g</span>
+                  </div>
+
+                  <dl className="mt-8 flex flex-col divide-y divide-white/10 border-y border-white/10 text-sm">
+                    <div className="flex items-center justify-between gap-4 py-3">
+                      <dt className="text-white/60">Cotação oficial</dt>
+                      <dd className="num text-right text-white/70">
+                        {formatEUR(activeParams.officialPerGram)}/g → {formatEUR(activeParams.officialTotal)}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 py-3">
+                      <dt className="text-white/60">Pagamos</dt>
+                      <dd className="num text-right font-semibold text-white">
+                        {formatEUR(activeParams.payPerGram)}/g × {gramsNum}g
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className="relative flex flex-col gap-3">
                   <div className="flex gap-2">
                     <button
                       onClick={handleSave}
                       disabled={gramsNum <= 0}
-                      className={`flex-1 h-11 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 disabled:opacity-40 ${
-                        isGold
-                          ? 'bg-amber-500 hover:bg-amber-400 text-amber-950 shadow-[0_4px_24px_rgba(245,158,11,0.3)] hover:shadow-[0_4px_32px_rgba(245,158,11,0.5)]'
-                          : light
-                            ? 'bg-slate-600 hover:bg-slate-500 text-white'
-                            : 'bg-zinc-200 hover:bg-white text-zinc-900'
-                      }`}
+                      className="h-12 flex-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-sm font-semibold text-amber-950 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.8)] transition-all hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 active:translate-y-0 disabled:opacity-40"
                     >
-                      Guardar Simulação
+                      Guardar simulação
                     </button>
                     {history.length > 0 && (
                       <button
                         onClick={() => setShowHistory((v) => !v)}
-                        className="flex items-center gap-1.5 px-3 h-11 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors"
-                        style={{ background: pillBg, border: `1px solid ${dividerColor}`, color: textSecondary }}
+                        aria-expanded={showHistory}
+                        aria-label="Mostrar simulações guardadas"
+                        className="inline-flex h-12 items-center gap-1.5 rounded-full bg-white/10 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/15"
                       >
-                        {history.length}
-                        {showHistory ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                        <span className="num">{history.length}</span>
+                        <ChevronDown className={cn('h-4 w-4 transition-transform duration-300', showHistory && 'rotate-180')} />
                       </button>
                     )}
                   </div>
 
                   {/* ⑥ History */}
-                  {showHistory && history.length > 0 && (
-                    <div className="mt-4 rounded-xl overflow-hidden" style={{ border: `1px solid ${historyBorder}` }}>
-                      <div className="flex items-center justify-between px-4 py-2 border-b" style={{ background: historyBg, borderColor: historyBorder }}>
-                        <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: textMuted }}>Histórico</span>
-                        <button
-                          onClick={() => {
-                            setHistory([])
-                            localStorage.removeItem('dbgold_simulations')
-                            setShowHistory(false)
-                          }}
-                          className="text-[9px] text-rose-500/70 hover:text-rose-500 font-bold uppercase transition-colors"
-                        >Limpar</button>
-                      </div>
-                      <div className="max-h-44 overflow-y-auto">
-                        {history.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between px-4 py-2.5 border-b last:border-0 hover:bg-black/[0.02]" style={{ borderColor: dividerColor }}>
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded shrink-0 ${item.metal === 'ouro' ? 'bg-amber-500/15 text-amber-600' : light ? 'bg-slate-200 text-slate-600' : 'bg-white/10 text-zinc-300'}`}>
-                                {item.metal}
-                              </span>
-                              <span className="text-[11px] truncate" style={{ color: textSecondary }}>{item.purityLabel} · {item.grams}g</span>
-                              <span className="text-[10px] shrink-0" style={{ color: textFaint }}>{item.timestamp}</span>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-xs font-bold font-mono" style={{ color: textPrimary }}>{formatEUR(item.total)}</span>
-                              <button onClick={() => handleDelete(item.id)} className="transition-colors" style={{ color: textFaint }}>
-                                <Trash2 className="h-3 w-3 hover:text-rose-500" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                  <div
+                    className={cn(
+                      'grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                      showHistory && history.length > 0 ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    )}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="mt-2 rounded-2xl bg-white/[0.06] p-3">
+                        <div className="mb-1 flex items-center justify-between px-1">
+                          <span className="text-xs text-white/50">Simulações guardadas</span>
+                          <button
+                            onClick={() => {
+                              setHistory([])
+                              localStorage.removeItem('dbgold_simulations')
+                              setShowHistory(false)
+                            }}
+                            className="text-xs font-medium text-white/50 transition-colors hover:text-rose-400"
+                          >
+                            Limpar
+                          </button>
+                        </div>
+                        <ul className="max-h-44 overflow-y-auto">
+                          {history.map((item) => (
+                            <li key={item.id} className="flex items-center justify-between gap-3 rounded-lg px-1 py-2 hover:bg-white/5">
+                              <div className="flex min-w-0 items-center gap-2">
+                                <span className={cn('h-2 w-2 shrink-0 rounded-full', item.metal === 'ouro' ? 'bg-amber-400' : 'bg-slate-300')} />
+                                <span className="truncate text-sm text-white/85">
+                                  {item.purityLabel} · <span className="num">{item.grams}g</span>
+                                </span>
+                                <span className="num hidden shrink-0 text-[11px] text-white/40 sm:inline">{item.timestamp}</span>
+                              </div>
+                              <div className="flex shrink-0 items-center gap-1">
+                                <span className="num text-sm font-semibold text-white">{formatEUR(item.total)}</span>
+                                <button
+                                  onClick={() => handleDelete(item.id)}
+                                  aria-label="Apagar simulação"
+                                  className="rounded p-1 text-white/40 transition-colors hover:text-rose-400"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
-                  )}
-
-                  
-
+                  </div>
                 </div>
+              </div>
             </div>
-            </div>
+          </div>
 
+          {/* Live price strip below the simulator */}
+          <div className="mx-auto mt-6 flex max-w-5xl flex-col items-center justify-between gap-4 px-2 text-sm text-muted-foreground md:flex-row">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-gradient-to-br from-yellow-300 to-amber-600" />
+                Ouro 24K
+                <span className="num font-semibold text-foreground">{goldPrice > 0 ? `${formatEUR(goldPrice)}/g` : 'Sob Consulta'}</span>
+                <TrendLabel trend={goldTrend} />
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-gradient-to-br from-slate-200 to-slate-500" />
+                Prata 999
+                <span className="num font-semibold text-foreground">
+                  {silverPrice && silverPrice > 0 ? `${formatEUR(silverPrice)}/g` : 'Sob Consulta'}
+                </span>
+                <TrendLabel trend={silverTrend} />
+              </span>
+            </div>
+            <span className="flex items-center gap-2 text-center text-xs">
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              Fixing de Londres: <strong className="font-semibold text-foreground">10h35</strong> e{' '}
+              <strong className="font-semibold text-foreground">15h05</strong> (Ouro) · <strong className="font-semibold text-foreground">12h05</strong> (Prata)
+            </span>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
