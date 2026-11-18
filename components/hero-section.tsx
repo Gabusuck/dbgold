@@ -182,7 +182,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
   return (
     <>
       {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28">
+      <section className="relative overflow-hidden pt-28 pb-10 sm:pt-36 sm:pb-20 md:pt-44 md:pb-28">
         {/* Animated aurora */}
         <div className="pointer-events-none absolute inset-0 -z-0" aria-hidden>
           <div className="aurora aurora-1 left-[8%] top-[6%] h-[380px] w-[380px] bg-amber-300/40 dark:bg-amber-500/15" />
@@ -206,33 +206,33 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
             </span>
           </a>
 
-          <h1 className="anim-fade-up anim-delay-1 mt-8 max-w-5xl text-balance text-[2.9rem] font-semibold leading-[0.98] tracking-[-0.05em] text-foreground sm:text-7xl md:text-[5.5rem]">
+          <h1 className="anim-fade-up anim-delay-1 mt-6 max-w-5xl text-balance text-[2.6rem] sm:mt-8 font-semibold leading-[0.98] tracking-[-0.05em] text-foreground sm:text-7xl md:text-[5.5rem]">
             Compramos ouro &amp; prata
             <br />
             <span className="text-gold-gradient">ao melhor preço.</span>
           </h1>
 
-          <p className="anim-fade-up anim-delay-2 mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+          <p className="anim-fade-up anim-delay-2 mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:mt-7 sm:text-lg md:text-xl">
             Transformamos os seus metais preciosos em capital imediato, com avaliação técnica profissional e cotações oficiais diárias.
           </p>
 
-          <div className="anim-fade-up anim-delay-3 mt-10 flex flex-col items-center gap-3 sm:flex-row">
+          <div className="anim-fade-up anim-delay-3 mt-7 flex flex-row items-center gap-2 sm:mt-10 sm:gap-3">
             <a
               href="#simulador"
-              className="group inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)]"
+              className="group inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm sm:h-12 sm:px-7 font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)]"
             >
               Simular valor agora
               <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
             </a>
             <a
               href="#precos"
-              className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted sm:h-12 sm:px-6"
             >
               Ver cotações
             </a>
           </div>
 
-          <ul className="anim-fade-up anim-delay-4 mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm text-muted-foreground">
+          <ul className="anim-fade-up anim-delay-4 mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[13px] text-muted-foreground sm:mt-12 sm:gap-x-7 sm:gap-y-3 sm:text-sm">
             {['Sem comissões ocultas', 'Avaliação presencial', 'Fecho no próprio dia'].map((t) => (
               <li key={t} className="flex items-center gap-2">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -246,7 +246,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
       </section>
 
       {/* ═══════════════ SIMULATOR ═══════════════ */}
-      <section id="simulador" className="relative scroll-mt-24 pb-16 md:pb-32">
+      <section id="simulador" className="relative scroll-mt-20 pb-16 md:pb-32">
         <div className="container-page">
           <div
             ref={cardRef}
@@ -257,8 +257,8 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
             <div className="relative grid lg:grid-cols-[1.15fr_1fr]">
               {/* ── Controls ── */}
-              <div className="flex flex-col gap-5 p-4 sm:gap-8 sm:p-8 md:p-10">
-                <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-4 p-4 pt-2 sm:gap-8 sm:p-8 md:p-10">
+                <div className="hidden items-start justify-between gap-4 sm:flex">
                   <div>
                     <h2 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">Simulador de venda</h2>
                     <p className="mt-0.5 text-[13px] text-muted-foreground sm:mt-1 sm:text-sm">Estimativa instantânea com a cotação de hoje.</p>
@@ -304,7 +304,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       {isGold ? selectedGold.label : selectedSilver.label}
                     </span>
                   </div>
-                  <div key={metalType} className={cn('pop grid gap-2', isGold ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-4')}>
+                  <div key={metalType} className={cn('pop grid gap-1.5 sm:gap-2', isGold ? 'grid-cols-6' : 'grid-cols-4')}>
                     {isGold
                       ? KARATS.map((k) => {
                           const active = karatValue === String(k.karat)
@@ -317,14 +317,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                               aria-label={isPT ? 'Ouro português 19.2 quilates' : `${k.karat} quilates`}
                               className={cn(
                                 chip(active),
-                                'flex h-12 flex-col items-center justify-center gap-0.5 sm:h-14',
+                                'flex h-12 flex-col items-center justify-center gap-0.5 px-0 text-[13px] sm:h-14 sm:text-sm',
                                 isPT && !active && 'ring-1 ring-inset ring-amber-500/50 bg-amber-500/10 text-foreground'
                               )}
                             >
                               <span>{k.karat}K</span>
                               <span
                                 className={cn(
-                                  'text-[10px] font-medium leading-none',
+                                  'text-[8.5px] font-medium leading-none tracking-tight sm:text-[10px] sm:tracking-normal',
                                   isPT
                                     ? active ? 'text-amber-300' : 'text-amber-700 dark:text-amber-400'
                                     : active ? 'text-background/60' : 'text-muted-foreground/70'
@@ -350,7 +350,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 {/* ③ Weight */}
                 <div>
-                  <div className="mb-1 flex items-center justify-between sm:mb-3">
+                  <div className="mb-2 flex items-center justify-between sm:mb-3">
                     <label htmlFor="sim-weight" className="text-sm font-medium text-foreground">Peso</label>
                     <div className="relative">
                       <input
@@ -369,7 +369,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                   </div>
 
                   {/* Range slider */}
-                  <div className="relative py-3">
+                  <div className="relative hidden py-3 sm:block">
                     <div className="h-1.5 w-full rounded-full bg-muted" />
                     <div
                       className="absolute left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-[width] duration-150"
@@ -412,7 +412,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
               </div>
 
               {/* ── Result panel ── */}
-              <div className="shine relative m-2 flex flex-col justify-between gap-5 overflow-hidden rounded-[1.4rem] bg-zinc-950 p-5 text-white sm:gap-8 sm:rounded-[1.6rem] sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
+              <div className="shine relative order-first m-2 flex flex-col justify-between gap-4 overflow-hidden rounded-[1.4rem] bg-zinc-950 p-4 text-white lg:order-none sm:gap-8 sm:rounded-[1.6rem] sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
                 <div
                   className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-[80px] transition-colors duration-700"
                   style={{ background: isGold ? 'rgba(245,158,11,0.35)' : 'rgba(148,163,184,0.3)' }}
@@ -421,7 +421,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 <div className="relative">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/60">Recebe aproximadamente</span>
+                    <span className="text-[13px] text-white/60 sm:text-sm">Recebe aproximadamente</span>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/80">
                       <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       Live
@@ -444,14 +444,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     {' '}· <span className="num">{gramsNum}g</span>
                   </div>
 
-                  <dl className="mt-4 flex flex-col divide-y divide-white/10 border-y border-white/10 text-[13px] sm:mt-8 sm:text-sm">
-                    <div className="flex items-center justify-between gap-4 py-2.5 sm:py-3">
+                  <dl className="mt-3 flex flex-col divide-y divide-white/10 border-y border-white/10 text-xs sm:mt-8 sm:text-sm">
+                    <div className="flex items-center justify-between gap-4 py-2 sm:py-3">
                       <dt className="text-white/60">Cotação oficial</dt>
                       <dd className="num text-right text-white/70">
                         {formatEUR(activeParams.officialPerGram)}/g → {formatEUR(activeParams.officialTotal)}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4 py-2.5 sm:py-3">
+                    <div className="flex items-center justify-between gap-4 py-2 sm:py-3">
                       <dt className="text-white/60">Pagamos</dt>
                       <dd className="num text-right font-semibold text-white">
                         {formatEUR(activeParams.payPerGram)}/g × {gramsNum}g
