@@ -60,6 +60,31 @@ export function TrendLabel({ trend, className }: { trend: Trend; className?: str
   )
 }
 
+function StepLabel({
+  n,
+  children,
+  aside,
+  htmlFor,
+}: {
+  n: number
+  children: React.ReactNode
+  aside?: React.ReactNode
+  htmlFor?: string
+}) {
+  const Tag = htmlFor ? 'label' : 'div'
+  return (
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <Tag {...(htmlFor ? { htmlFor } : {})} className="flex items-center gap-2.5 text-sm font-semibold text-foreground">
+        <span className="num flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-[11px] font-semibold text-background">
+          {n}
+        </span>
+        {children}
+      </Tag>
+      {aside}
+    </div>
+  )
+}
+
 export function HeroSection({ settings, priceHistory }: { settings: GoldSettings; priceHistory?: PriceHistoryEntry[] }) {
   const [metalType, setMetalType] = useState<'ouro' | 'prata'>('ouro')
   const [karatValue, setKaratValue] = useState('18')
@@ -257,15 +282,15 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
             <div className="relative grid lg:grid-cols-[1.15fr_1fr]">
               {/* ── Controls ── */}
-              <div className="flex flex-col gap-4 p-4 pt-2 sm:gap-8 sm:p-8 md:p-10">
-                <div className="hidden items-start justify-between gap-4 sm:flex">
-                  <div>
-                    <h2 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">Simulador de venda</h2>
-                    <p className="mt-0.5 text-[13px] text-muted-foreground sm:mt-1 sm:text-sm">Estimativa instantânea com a cotação de hoje.</p>
-                  </div>
+              <div className="flex flex-col p-5 sm:p-8 md:p-10">
+                <div>
+                  <h2 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">Simulador de venda</h2>
+                  <p className="mt-0.5 text-[13px] text-muted-foreground sm:mt-1 sm:text-sm">Estimativa instantânea com a cotação de hoje.</p>
                 </div>
 
                 {/* ① Metal toggle with sliding indicator */}
+                <div className="mt-5 sm:mt-8">
+                <StepLabel n={1}>Metal</StepLabel>
                 <div className="relative grid grid-cols-2 rounded-2xl bg-muted p-1.5" role="tablist" aria-label="Metal">
                   <span
                     className="absolute inset-y-1.5 left-1.5 w-[calc(50%-0.375rem)] rounded-xl bg-card shadow-[0_4px_14px_-4px_rgba(0,0,0,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
@@ -295,16 +320,21 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     </button>
                   ))}
                 </div>
+                </div>
 
                 {/* ② Quality */}
-                <div>
-                  <div className="mb-2 flex items-baseline justify-between sm:mb-3">
-                    <span className="text-sm font-medium text-foreground">Qualidade</span>
-                    <span key={isGold ? karatValue : silverValue} className="pop text-xs text-muted-foreground">
-                      {isGold ? selectedGold.label : selectedSilver.label}
-                    </span>
-                  </div>
-                  <div key={metalType} className={cn('pop grid gap-1.5 sm:gap-2', isGold ? 'grid-cols-6' : 'grid-cols-4')}>
+                <div className="mt-5 border-t border-border pt-5 sm:mt-7 sm:border-0 sm:pt-0">
+                  <StepLabel
+                    n={2}
+                    aside={
+                      <span key={isGold ? karatValue : silverValue} className="pop text-xs text-muted-foreground">
+                        {isGold ? selectedGold.label : selectedSilver.label}
+                      </span>
+                    }
+                  >
+                    Qualidade
+                  </StepLabel>
+                  <div key={metalType} className={cn('pop grid gap-2', isGold ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-4')}>
                     {isGold
                       ? KARATS.map((k) => {
                           const active = karatValue === String(k.karat)
@@ -317,14 +347,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                               aria-label={isPT ? 'Ouro português 19.2 quilates' : `${k.karat} quilates`}
                               className={cn(
                                 chip(active),
-                                'flex h-12 flex-col items-center justify-center gap-0.5 px-0 text-[13px] sm:h-14 sm:text-sm',
+                                'flex h-14 flex-col items-center justify-center gap-0.5 px-0 text-sm',
                                 isPT && !active && 'ring-1 ring-inset ring-amber-500/50 bg-amber-500/10 text-foreground'
                               )}
                             >
                               <span>{k.karat}K</span>
                               <span
                                 className={cn(
-                                  'text-[8.5px] font-medium leading-none tracking-tight sm:text-[10px] sm:tracking-normal',
+                                  'text-[10px] font-medium leading-none',
                                   isPT
                                     ? active ? 'text-amber-300' : 'text-amber-700 dark:text-amber-400'
                                     : active ? 'text-background/60' : 'text-muted-foreground/70'
@@ -349,23 +379,21 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                 </div>
 
                 {/* ③ Weight */}
-                <div>
-                  <div className="mb-2 flex items-center justify-between sm:mb-3">
-                    <label htmlFor="sim-weight" className="text-sm font-medium text-foreground">Peso</label>
-                    <div className="relative">
-                      <input
-                        id="sim-weight"
-                        type="number"
-                        inputMode="decimal"
-                        min="0.1"
-                        max="9999"
-                        step="0.1"
-                        value={grams}
-                        onChange={(e) => setGrams(e.target.value)}
-                        className="no-spinner num h-10 w-28 rounded-xl border border-border bg-background pl-3 pr-8 text-right text-base font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-amber-500 focus:ring-4 focus:ring-amber-500/15"
-                      />
-                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-sm text-muted-foreground">g</span>
-                    </div>
+                <div className="mt-5 border-t border-border pt-5 sm:mt-7 sm:border-0 sm:pt-0">
+                  <StepLabel n={3} htmlFor="sim-weight">Peso</StepLabel>
+                  <div className="relative">
+                    <input
+                      id="sim-weight"
+                      type="number"
+                      inputMode="decimal"
+                      min="0.1"
+                      max="9999"
+                      step="0.1"
+                      value={grams}
+                      onChange={(e) => setGrams(e.target.value)}
+                      className="no-spinner num h-12 w-full rounded-xl border border-border bg-background pl-4 pr-16 text-lg font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-amber-500 focus:ring-4 focus:ring-amber-500/15"
+                    />
+                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 select-none text-sm text-muted-foreground">gramas</span>
                   </div>
 
                   {/* Range slider */}
@@ -391,14 +419,14 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     />
                   </div>
 
-                  <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-2 sm:gap-2">
+                  <div className="mt-2.5 grid grid-cols-6 gap-1.5 sm:mt-2 sm:flex sm:flex-wrap sm:gap-2">
                     {WEIGHT_PRESETS.map((w) => (
                       <button
                         key={w}
                         onClick={() => setGrams(String(w))}
                         aria-pressed={gramsNum === w}
                         className={cn(
-                          'num h-8 rounded-full border px-3.5 text-xs font-semibold transition-all duration-200',
+                          'num h-9 rounded-full border px-0 text-xs font-semibold transition-all duration-200 sm:h-8 sm:px-3.5',
                           gramsNum === w
                             ? 'border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400'
                             : 'border-border text-muted-foreground hover:border-foreground/25 hover:text-foreground'
@@ -412,7 +440,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
               </div>
 
               {/* ── Result panel ── */}
-              <div className="shine relative order-first m-2 flex flex-col justify-between gap-4 overflow-hidden rounded-[1.4rem] bg-zinc-950 p-4 text-white lg:order-none sm:gap-8 sm:rounded-[1.6rem] sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
+              <div className="shine relative m-2 mt-0 flex flex-col justify-between gap-4 overflow-hidden rounded-[1.4rem] bg-zinc-950 p-5 text-white sm:gap-8 lg:mt-2 sm:rounded-[1.6rem] sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
                 <div
                   className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-[80px] transition-colors duration-700"
                   style={{ background: isGold ? 'rgba(245,158,11,0.35)' : 'rgba(148,163,184,0.3)' }}
