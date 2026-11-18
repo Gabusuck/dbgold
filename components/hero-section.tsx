@@ -173,7 +173,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
   const chip = (active: boolean) =>
     cn(
-      'num relative h-11 rounded-xl text-sm font-semibold transition-all duration-300',
+      'num relative h-10 rounded-xl text-sm font-semibold transition-all duration-300 sm:h-11',
       active
         ? 'bg-foreground text-background shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45)] scale-[1.03]'
         : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
@@ -246,22 +246,22 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
       </section>
 
       {/* ═══════════════ SIMULATOR ═══════════════ */}
-      <section id="simulador" className="relative scroll-mt-24 pb-24 md:pb-32">
+      <section id="simulador" className="relative scroll-mt-24 pb-16 md:pb-32">
         <div className="container-page">
           <div
             ref={cardRef}
             onMouseMove={onCardMove}
-            className="group/card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)] dark:shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]"
+            className="group/card relative mx-auto max-w-5xl overflow-hidden rounded-[1.6rem] sm:rounded-[2rem] border border-border bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)] dark:shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]"
           >
             <div className="spotlight pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100" />
 
             <div className="relative grid lg:grid-cols-[1.15fr_1fr]">
               {/* ── Controls ── */}
-              <div className="flex flex-col gap-8 p-6 sm:p-8 md:p-10">
+              <div className="flex flex-col gap-5 p-4 sm:gap-8 sm:p-8 md:p-10">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">Simulador de venda</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">Estimativa instantânea com a cotação de hoje.</p>
+                    <h2 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">Simulador de venda</h2>
+                    <p className="mt-0.5 text-[13px] text-muted-foreground sm:mt-1 sm:text-sm">Estimativa instantânea com a cotação de hoje.</p>
                   </div>
                 </div>
 
@@ -279,7 +279,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                       aria-selected={metalType === m}
                       onClick={() => setMetalType(m)}
                       className={cn(
-                        'relative z-10 flex h-11 items-center justify-center gap-2 text-sm font-semibold transition-colors duration-300',
+                        'relative z-10 flex h-9 items-center justify-center gap-2 text-sm font-semibold transition-colors duration-300 sm:h-11',
                         metalType === m ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
@@ -298,7 +298,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 {/* ② Quality */}
                 <div>
-                  <div className="mb-3 flex items-baseline justify-between">
+                  <div className="mb-2 flex items-baseline justify-between sm:mb-3">
                     <span className="text-sm font-medium text-foreground">Qualidade</span>
                     <span key={isGold ? karatValue : silverValue} className="pop text-xs text-muted-foreground">
                       {isGold ? selectedGold.label : selectedSilver.label}
@@ -317,7 +317,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                               aria-label={isPT ? 'Ouro português 19.2 quilates' : `${k.karat} quilates`}
                               className={cn(
                                 chip(active),
-                                'flex h-14 flex-col items-center justify-center gap-0.5',
+                                'flex h-12 flex-col items-center justify-center gap-0.5 sm:h-14',
                                 isPT && !active && 'ring-1 ring-inset ring-amber-500/50 bg-amber-500/10 text-foreground'
                               )}
                             >
@@ -350,7 +350,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
 
                 {/* ③ Weight */}
                 <div>
-                  <div className="mb-3 flex items-baseline justify-between">
+                  <div className="mb-1 flex items-center justify-between sm:mb-3">
                     <label htmlFor="sim-weight" className="text-sm font-medium text-foreground">Peso</label>
                     <div className="relative">
                       <input
@@ -391,7 +391,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     />
                   </div>
 
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-2 sm:gap-2">
                     {WEIGHT_PRESETS.map((w) => (
                       <button
                         key={w}
@@ -412,7 +412,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
               </div>
 
               {/* ── Result panel ── */}
-              <div className="shine relative m-2 flex flex-col justify-between gap-8 overflow-hidden rounded-[1.6rem] bg-zinc-950 p-6 text-white sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
+              <div className="shine relative m-2 flex flex-col justify-between gap-5 overflow-hidden rounded-[1.4rem] bg-zinc-950 p-5 text-white sm:gap-8 sm:rounded-[1.6rem] sm:p-8 md:p-10 lg:ml-0 dark:bg-zinc-900">
                 <div
                   className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-[80px] transition-colors duration-700"
                   style={{ background: isGold ? 'rgba(245,158,11,0.35)' : 'rgba(148,163,184,0.3)' }}
@@ -428,30 +428,30 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     </span>
                   </div>
 
-                  <div aria-live="polite" className="mt-3">
+                  <div aria-live="polite" className="mt-2 sm:mt-3">
                     <AnimatedNumber
                       value={activeParams.total}
                       format={formatEUR}
                       className={cn(
-                        'num block text-5xl font-semibold tracking-[-0.045em] sm:text-6xl',
+                        'num block text-4xl font-semibold tracking-[-0.045em] sm:text-6xl',
                         isGold ? 'text-gold-gradient' : 'text-slate-100'
                       )}
                     />
                   </div>
-                  <div className="mt-2 text-sm text-white/50">
+                  <div className="mt-1 text-[13px] text-white/50 sm:mt-2 sm:text-sm">
                     {activeParams.purityLabel}
                     {isGold && selectedGold.karat === 19.2 && <span className="text-amber-300/90"> (Português)</span>}
                     {' '}· <span className="num">{gramsNum}g</span>
                   </div>
 
-                  <dl className="mt-8 flex flex-col divide-y divide-white/10 border-y border-white/10 text-sm">
-                    <div className="flex items-center justify-between gap-4 py-3">
+                  <dl className="mt-4 flex flex-col divide-y divide-white/10 border-y border-white/10 text-[13px] sm:mt-8 sm:text-sm">
+                    <div className="flex items-center justify-between gap-4 py-2.5 sm:py-3">
                       <dt className="text-white/60">Cotação oficial</dt>
                       <dd className="num text-right text-white/70">
                         {formatEUR(activeParams.officialPerGram)}/g → {formatEUR(activeParams.officialTotal)}
                       </dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4 py-3">
+                    <div className="flex items-center justify-between gap-4 py-2.5 sm:py-3">
                       <dt className="text-white/60">Pagamos</dt>
                       <dd className="num text-right font-semibold text-white">
                         {formatEUR(activeParams.payPerGram)}/g × {gramsNum}g
@@ -465,7 +465,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                     <button
                       onClick={handleSave}
                       disabled={gramsNum <= 0}
-                      className="h-12 flex-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-sm font-semibold text-amber-950 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.8)] transition-all hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 active:translate-y-0 disabled:opacity-40"
+                      className="h-11 flex-1 rounded-full bg-gradient-to-r from-amber-400 sm:h-12 to-amber-500 text-sm font-semibold text-amber-950 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.8)] transition-all hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 active:translate-y-0 disabled:opacity-40"
                     >
                       Guardar simulação
                     </button>
@@ -474,7 +474,7 @@ export function HeroSection({ settings, priceHistory }: { settings: GoldSettings
                         onClick={() => setShowHistory((v) => !v)}
                         aria-expanded={showHistory}
                         aria-label="Mostrar simulações guardadas"
-                        className="inline-flex h-12 items-center gap-1.5 rounded-full bg-white/10 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+                        className="inline-flex h-11 items-center gap-1.5 rounded-full bg-white/10 sm:h-12 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/15"
                       >
                         <span className="num">{history.length}</span>
                         <ChevronDown className={cn('h-4 w-4 transition-transform duration-300', showHistory && 'rotate-180')} />
